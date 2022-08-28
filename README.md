@@ -1,5 +1,7 @@
 # stackchan-bluetooth-simple
 
+日本語 | [English](README_en.md)
+
 # 概要
 
 M5Stack-AvatarをベースにシンプルにBluetoothスピーカー機能とスタックチャンのサーボコントロール機能をつけました。
