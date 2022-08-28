@@ -12,8 +12,6 @@
 #include "BluetoothA2DPSink_M5Speaker.hpp"
 #include "Avatar.h"
 
-#include <FastLED.h>
-
 using namespace m5avatar;
 Avatar avatar;
 StackchanSERVO servo;
@@ -105,7 +103,6 @@ bool sing_happy = true;
 // --------------------
 
 uint32_t last_discharge_time = 0;  // USB給電が止まったときの時間(msec)
-CRGB LED[1];
 
 /// set M5Speaker virtual channel (0-7)
 static constexpr uint8_t m5spk_virtual_channel = 0;
@@ -260,7 +257,6 @@ void setup(void)
   avatar.addTask(servoLoop, "servoLoop");
   avatar.setExpression(Expression::Neutral);
   avatar.setSpeechFont(font_name);
-  avatar.setSpeechText("你好");
 
   if (bluetooth_mode) {
     a2dp_sink.set_avrc_metadata_callback(avrc_metadata_callback);
@@ -269,11 +265,6 @@ void setup(void)
     avatar.setExpression(Expression::Sad);
     avatar.setSpeechText("Bluetooth Mode");
   }
-
-  FastLED.addLeds<SK6812, 26, GRB>(LED, 1);
-  LED[0] = CRGB::Blue;
-  FastLED.setBrightness(100);
-  FastLED.show();
 
 }
 
