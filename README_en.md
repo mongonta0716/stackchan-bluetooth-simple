@@ -92,7 +92,7 @@ When not in Bluetooth mode, the words set below are displayed.
 
 - lyrics<br>Randomly displays the set characters.
 
-# 使い方
+# Usage
 
 - BtnA<br>Enters Bluetooth mode. (Only valid when bluetooth_mode = false)
 
