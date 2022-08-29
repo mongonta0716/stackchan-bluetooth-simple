@@ -331,7 +331,7 @@ void loop(void)
 #if not(defined(ARDUINO_M5STACK_FIRE) || defined(ARDUINO_M5Stack_Core_ESP32)) // FireはAxp192ではないのとI2Cが使えないので制御できません。
   if (M5.Power.Axp192.getACINVolatge() < 3.0f) {
     // USBからの給電が停止したとき
-    // Serial.println("USBPowerUnPluged.");
+    // Serial.println("USBPowerUnPlugged.");
     M5.Power.setLed(0);
     if ((auto_power_off_time > 0) and (last_discharge_time == 0)) {
       last_discharge_time = millis();
@@ -339,7 +339,7 @@ void loop(void)
       M5.Power.powerOff();
     }
   } else {
-    //Serial.println("USBPowerPluged.");
+    //Serial.println("USBPowerPlugged.");
     M5.Power.setLed(80);
     if (last_discharge_time > 0) {
       last_discharge_time = 0;
