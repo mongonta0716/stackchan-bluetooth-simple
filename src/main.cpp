@@ -56,8 +56,8 @@ int servo_offset_x = 0;                 // X軸サーボのオフセット（90�
 int servo_offset_y = 0;                 // Y軸サーボのオフセット（90°からの+-で設定）  Offset of ServoY
 
 // ----- あまり間隔を短くしすぎるとサーボが壊れやすくなるので注意(単位:msec)　If you move the servo too often, it will break.
-static long interval_min      = 3000;        // 待機時インターバル最小            Standby mode interval MIN
-static long interval_max      = 6000;        // 待機時インターバル最大            Standby mode interval MAX
+static long interval_min      = 5000;        // 待機時インターバル最小            Standby mode interval MIN
+static long interval_max      = 10000;        // 待機時インターバル最大            Standby mode interval MAX
 static long interval_move_min = 500;         // 待機時のサーボ移動時間最小        Standby mode move time MIN
 static long interval_move_max = 1500;        // 待機時のサーボ移動時間最大        Standby mode move time MAX
 static long sing_interval_min = 500;         // 歌うモードのインターバル最小      Sing mode interval MIN
@@ -75,7 +75,7 @@ static constexpr char bt_device_name[] = "ESP32DeviceName";
 
 // 起動時にBluetoothモードにするかどうか
 // Flag whether BluetoothMode is enabled or disabled at startup
-bool bluetooth_mode = false;
+bool bluetooth_mode = true;
 // --------------------
 
 // auto poweroff 
@@ -87,7 +87,7 @@ uint32_t auto_power_off_time = 0;  // USB給電が止まった後自動で電源
 // フォントによっては4MBのM5StackではFlashメモリが足りなくなる場合があります。
 // Some fonts cannot be written in M5Stack with 4MB of Flash because of the size of the sketch.
 const lgfx::IFont* font_name = &fonts::efontJA_16;
-const char* lyrics[] = {"Hello", "こんにちは", "你好", "Bonjour"};
+const char* lyrics[] = {"Hello", "こんにちは", "你好", "Bonjour", "私はスタックチャン", "I'm Stackchan", "我是Stack-chan"};
 
 //---------------------------------------------------------------------- End Of User Setting area ---------------------------------------------------------------------
 //---------------------------------------------------------------------- End Of User Setting area ---------------------------------------------------------------------
@@ -147,7 +147,7 @@ void servoLoop(void *args) {
     move_y = START_DEGREE_VALUE_Y - mouth_ratio * 10 - abs(25.0 * gaze_y);
     servo.moveXY(move_x, move_y, move_time);
     if (!bluetooth_mode) {
-      int exp = random(4);
+      int exp = random(7);
       int exp2 = random(2);
       avatar.setMouthOpenRatio(1.0f);
       avatar.setSpeechText(lyrics[exp]);
@@ -251,8 +251,9 @@ void setup(void)
   servo.begin(SERVO_PIN_X, START_DEGREE_VALUE_X, servo_offset_x,
               SERVO_PIN_Y, START_DEGREE_VALUE_Y, servo_offset_y);
   delay(3000);
+
   avatar.init(); // start drawing
- 
+
   avatar.addTask(lipSync, "lipSync");
   avatar.addTask(servoLoop, "servoLoop");
   avatar.setExpression(Expression::Neutral);
