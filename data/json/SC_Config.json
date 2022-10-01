@@ -1,30 +1,33 @@
 {
+    "comment" : "The comment item is only a description and does not need to be changed.",
     "servo" : {
         "pin" : {
-            // ServoPin
-            // Core1 PortA X:22,Y:21 PortC X:16,Y:17
-            // Core2 PortA X:33,Y:34 PortC X:13,Y:14
-            // Stack-chanPCB Core1 X:5,Y:2 Core2 X:27,Y19
+            "commnts" : [
+                "ServoPin",
+                "Core1 PortA X:22,Y:21 PortC X:16,Y:17",
+                "Core2 PortA X:33,Y:34 PortC X:13,Y:14",
+                "Stack-chanPCB Core1 X:5,Y:2 Core2 X:27,Y19"
+            ],
             "x" : 13,
             "y" : 14
         },
         "offset" : {
-            // Specified by +- from 90 degree during servo initialization
+            "comment" : "Specified by +- from 90 degree during servo initialization",
             "x" : 0,
             "y" : 0
         },
         "speed" : {
-            "normal_mode" : {     // normal mode
-                "interval_min" : 3000,    // msec for interval(min)
-                "interval_max" : 6000,    // msec for interval(max)
-                "move_min"     : 500,     // msec for move(min)
-                "move_max"     : 1500     // msec for move(max)
+            "normal_mode" : {
+                "interval_min" : 3000,
+                "interval_max" : 6000,
+                "move_min"     : 500,
+                "move_max"     : 1500
             },
-            "sing_mode" : {      // Singing mode
-                "interval_min" : 500,     // msec for interval(min)
-                "interval_max" : 1000,    // msec for interval(max)
-                "move_min"     : 500,     // msec for move(min)
-                "move_max"     : 1000     // msec for move(max)
+            "sing_mode" : {
+                "interval_min" : 500,
+                "interval_max" : 1000,
+                "move_min"     : 500,
+                "move_max"     : 1000
             }
         }
     },
@@ -32,11 +35,13 @@
         "device_name" : "M5StackBTSPK",
         "starting_state" : false
     },
-    "auto_power_off_time" : 0, // time(msec) of auto power off(0 is disable.)
+    "comment_auto_power_off_time" : "time(msec) of auto power off(0 is disable.)",
+    "auto_power_off_time" : 0,
     "balloon" : {
-        "font_language" : "JA", // "JA" or "CN" or Default
+        "comment_font_language" : "JA or CN or Default",
+        "font_language" : "JA",
+        "comment_lyrics" : "A maximum of 10 can be specified.",
         "lyrics" : [
-        // A maximum of 10 can be specified.
             "こんにちは",
             "Hello",
             "Bonjour",
