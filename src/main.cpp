@@ -16,82 +16,18 @@ using namespace m5avatar;
 Avatar avatar;
 StackchanSERVO servo;
 
-//-------------------------------------------------------------------- Start Of User Setting area ---------------------------------------------------------------------
-//-------------------------------------------------------------------- Start Of User Setting area ---------------------------------------------------------------------
-//-------------------------------------------------------------------- Start Of User Setting area ---------------------------------------------------------------------
-// --------------------
-// サーボピンの初期設定(ServoPin setting area)
-#if defined(ARDUINO_M5STACK_Core2)
-  // M5Stack Core2用のサーボの設定(for M5Stack Core2)
-  // Port.A X:G33, Y:G32
-  // Port.C X:G13, Y:G14
-  // スタックチャン基板 X:G27, Y:G19
-  #define SERVO_PIN_X 13
-  #define SERVO_PIN_Y 14
-#elif defined( ARDUINO_M5STACK_FIRE )
-  // M5Stack Fire用のサーボの設定(for M5Stack Fire)
-  // M5Stack Fireの場合はPort.A(X:G22, Y:G21)のみです。
-  // I2Cと同時利用は不可
-  // PortC はPSRAMと競合しています
-  #define SERVO_PIN_X 22
-  #define SERVO_PIN_Y 21
-#elif defined( ARDUINO_M5Stack_Core_ESP32 )
-  // M5Stack Basic/Gray/Go用の設定(for M5Stack Basic or Gray or M5Go)
-  // Port.A X:G22, Y:G21
-  // Port.C X:G16, Y:G17
-  // スタックチャン基板 X:G5, Y:G2
-  #define SERVO_PIN_X 16
-  #define SERVO_PIN_Y 17
-#endif
-// サーボピンの初期設定end
-// --------------------
-
-
+#include "Stackchan_system_config.h"
 
 // --------------------
 // サーボ関連の初期設定
 #define START_DEGREE_VALUE_X 90         // Xサーボの初期位置（変更しないでください。） Start angle of ServoX
 #define START_DEGREE_VALUE_Y 90         // Yサーボの初期位置（変更しないでください。） Start angle of ServoY
-int servo_offset_x = 0;                 // X軸サーボのオフセット（90°からの+-で設定）  Offset of ServoX
-int servo_offset_y = 0;                 // Y軸サーボのオフセット（90°からの+-で設定）  Offset of ServoY
 
-// ----- あまり間隔を短くしすぎるとサーボが壊れやすくなるので注意(単位:msec)　If you move the servo too often, it will break.
-static long interval_min      = 5000;        // 待機時インターバル最小            Standby mode interval MIN
-static long interval_max      = 10000;        // 待機時インターバル最大            Standby mode interval MAX
-static long interval_move_min = 500;         // 待機時のサーボ移動時間最小        Standby mode move time MIN
-static long interval_move_max = 1500;        // 待機時のサーボ移動時間最大        Standby mode move time MAX
-static long sing_interval_min = 500;         // 歌うモードのインターバル最小      Sing mode interval MIN
-static long sing_interval_max = 1000;        // 歌うモードのインターバル最大      Sing mode interval MAX
-static long sing_move_min     = 500;         // 歌うモードのサーボ移動時間最小    Sing mode move time MIN
-static long sing_move_max     = 1000;        // 歌うモードのサーボ移動時間最大    Sing mode move time MAX
-// サーボ関連の設定 end
-// --------------------
+fs::FS json_fs = SD; // JSONファイルの収納場所(SPIFFS or SD)
+StackchanSystemConfig system_config;
+const char* stackchan_system_config_json = "/json/SC_Config.json";
 
-
-// --------------------
-// Bluetoothのデバイス名
-/// set ESP32-A2DP device name
-static constexpr char bt_device_name[] = "ESP32DeviceName";
-
-// 起動時にBluetoothモードにするかどうか
-// Flag whether BluetoothMode is enabled or disabled at startup
-bool bluetooth_mode = true;
-// --------------------
-
-// auto poweroff 
-// Time (msec) until power is automatically turned off after USB power supply stops. 0 means power is not turned off.
-uint32_t auto_power_off_time = 0;  // USB給電が止まった後自動で電源OFFするまでの時間（msec）。0は電源OFFしない。
-
-// ---------------
-// ランダムでセリフをしゃべる。
-// フォントによっては4MBのM5StackではFlashメモリが足りなくなる場合があります。
-// Some fonts cannot be written in M5Stack with 4MB of Flash because of the size of the sketch.
-const lgfx::IFont* font_name = &fonts::efontJA_16;
-const char* lyrics[] = {"Hello", "こんにちは", "你好", "Bonjour", "私はスタックチャン", "I'm Stackchan", "我是Stack-chan"};
-
-//---------------------------------------------------------------------- End Of User Setting area ---------------------------------------------------------------------
-//---------------------------------------------------------------------- End Of User Setting area ---------------------------------------------------------------------
-//---------------------------------------------------------------------- End Of User Setting area ---------------------------------------------------------------------
+bool bluetooth_mode = false; 
 
 // --------------------
 // Avatar関連の初期設定
@@ -123,15 +59,19 @@ void servoLoop(void *args) {
   for (;;) {
     if (mouth_ratio == 0.0f) {
       // 待機時の動き
-      interval_time = random(interval_min, interval_max);
-      move_time = random(interval_move_min, interval_move_max);
+      interval_time = random(system_config.getServoInterval(AvatarMode::NORMAL)->interval_min
+                           , system_config.getServoInterval(AvatarMode::NORMAL)->interval_max);
+      move_time = random(system_config.getServoInterval(AvatarMode::NORMAL)->move_min
+                       , system_config.getServoInterval(AvatarMode::NORMAL)->move_max);
       lipsync_level_max = LIPSYNC_LEVEL_MAX; // リップシンク上限の初期化
       sing_mode = false;
 
     } else {
       // 歌うモードの動き
-      interval_time = random(sing_interval_min, sing_interval_max);
-      move_time = random(sing_move_min, sing_move_max);
+      interval_time = random(system_config.getServoInterval(AvatarMode::SINGING)->interval_min
+                           , system_config.getServoInterval(AvatarMode::SINGING)->interval_max);
+      move_time = random(system_config.getServoInterval(AvatarMode::SINGING)->move_min
+                       , system_config.getServoInterval(AvatarMode::SINGING)->move_max);
       sing_mode = true;
     } 
     avatar.getGaze(&gaze_y, &gaze_x);
@@ -147,10 +87,10 @@ void servoLoop(void *args) {
     move_y = START_DEGREE_VALUE_Y - mouth_ratio * 10 - abs(25.0 * gaze_y);
     servo.moveXY(move_x, move_y, move_time);
     if (!bluetooth_mode) {
-      int exp = random(7);
+      int lyric_no = random(system_config.getLyrics_num());
       int exp2 = random(2);
       avatar.setMouthOpenRatio(1.0f);
-      avatar.setSpeechText(lyrics[exp]);
+      avatar.setSpeechText((const char*)system_config.getLyric(lyric_no)->c_str());
       if (exp2 % 2) {
         avatar.setExpression(Expression::Neutral);
       } else {
@@ -248,8 +188,18 @@ void setup(void)
   M5.Speaker.setVolume(200);
   M5.Speaker.setChannelVolume(200, m5spk_virtual_channel);
   
-  servo.begin(SERVO_PIN_X, START_DEGREE_VALUE_X, servo_offset_x,
-              SERVO_PIN_Y, START_DEGREE_VALUE_Y, servo_offset_y);
+  SPIFFS.begin();
+  SD.begin(GPIO_NUM_4, SPI, 25000000);
+
+  system_config.loadConfig(json_fs, stackchan_system_config_json);
+  
+  bluetooth_mode = system_config.getBluetoothSetting()->starting_state;
+  Serial.printf("Bluetooth_mode:%s\n", bluetooth_mode ? "true" : "false");
+  
+  servo.begin(system_config.getServoInfo()->servo_pin_x, START_DEGREE_VALUE_X,
+              system_config.getServoInfo()->servo_offset_x,
+              system_config.getServoInfo()->servo_pin_y, START_DEGREE_VALUE_Y,
+              system_config.getServoInfo()->servo_offset_y);
   delay(3000);
 
   avatar.init(); // start drawing
@@ -257,15 +207,18 @@ void setup(void)
   avatar.addTask(lipSync, "lipSync");
   avatar.addTask(servoLoop, "servoLoop");
   avatar.setExpression(Expression::Neutral);
-  avatar.setSpeechFont(font_name);
+  avatar.setSpeechFont(system_config.getFont());
 
   if (bluetooth_mode) {
     a2dp_sink.set_avrc_metadata_callback(avrc_metadata_callback);
     a2dp_sink.setHvtEventCallback(hvt_event_callback);
-    a2dp_sink.start(bt_device_name, true);
+    a2dp_sink.start(system_config.getBluetoothSetting()->device_name.c_str(), true);
     avatar.setExpression(Expression::Sad);
     avatar.setSpeechText("Bluetooth Mode");
+  } else {
+    avatar.setSpeechText("Normal Mode");
   }
+
 
 }
 
@@ -291,7 +244,7 @@ void loop(void)
       if (!bluetooth_mode) {
         a2dp_sink.set_avrc_metadata_callback(avrc_metadata_callback);
         a2dp_sink.setHvtEventCallback(hvt_event_callback);
-        a2dp_sink.start(bt_device_name, true);
+        a2dp_sink.start(system_config.getBluetoothSetting()->device_name.c_str(), true);
         avatar.setExpression(Expression::Sad);
         avatar.setSpeechText("Bluetooth Mode");
         M5.Speaker.tone(1000, 100);
@@ -334,9 +287,10 @@ void loop(void)
     // USBからの給電が停止したとき
     // Serial.println("USBPowerUnPlugged.");
     M5.Power.setLed(0);
-    if ((auto_power_off_time > 0) and (last_discharge_time == 0)) {
+    if ((system_config.getAutoPowerOffTime() > 0) and (last_discharge_time == 0)) {
       last_discharge_time = millis();
-    } else if ((auto_power_off_time > 0) and ((millis() - last_discharge_time) > auto_power_off_time)) {
+    } else if ((system_config.getAutoPowerOffTime() > 0) 
+               and ((millis() - last_discharge_time) > system_config.getAutoPowerOffTime())) {
       M5.Power.powerOff();
     }
   } else {
