@@ -9,8 +9,21 @@ StackchanSystemConfig::~StackchanSystemConfig() {
 }
 
 void StackchanSystemConfig::setDefaultParameters() {
-    _servo.servo_pin_x = 13;
-    _servo.servo_pin_y = 14;
+    switch(M5.getBoard()) {
+        case m5::board_t::board_M5StackCore2:
+            _servo.servo_pin_x = 13;
+            _servo.servo_pin_y = 14;
+            break;
+        case m5::board_t::board_M5Stack:
+            _servo.servo_pin_x = 22;
+            _servo.servo_pin_y = 21;
+            break;
+        default:
+            Serial.printf("UnknownBoard:%d\n", M5.getBoard());
+            _servo.servo_pin_x = 22;
+            _servo.servo_pin_y = 21;
+            break;
+    }
     _servo.servo_offset_x = 0;
     _servo.servo_offset_y = 0;
     _servo_interval[0].mode_name = "normal";
@@ -19,8 +32,8 @@ void StackchanSystemConfig::setDefaultParameters() {
     _servo_interval[0].move_min = 500;
     _servo_interval[0].move_max = 1500;
     _servo_interval[1].mode_name = "sing_mode";
-    _servo_interval[1].interval_min = 5000;
-    _servo_interval[1].interval_max = 10000;
+    _servo_interval[1].interval_min = 1000;
+    _servo_interval[1].interval_max = 2000;
     _servo_interval[1].move_min = 500;
     _servo_interval[1].move_max = 1500;
     _mode_num = 2;

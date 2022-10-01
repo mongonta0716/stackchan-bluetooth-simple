@@ -54,32 +54,32 @@ Please rewrite [setting area](https://github.com/mongonta0716/stackchan-bluetoot
 
 - servo
     - pin
-        - x<br> GPIO No of Servo X
-        - y<br> GPIO No of Servo Y
+        - x(Core1 22, Core2 13)<br> GPIO No of Servo X
+        - y(Core1 21, Core2 14)<br> GPIO No of Servo Y
     - offset<br>
-        - x<br> Offset x
-        - y<br> Offset y
+        - x(0)<br> Offset x
+        - y(0)<br> Offset y
 
     - speed<br>Specify the standby time and servo travel time when the sound is on standby and Bluetooth speaker. Specify a range with minimum and maximum values and use random values.
         - normal_mode
-             - interval_min
-             - interval_max
-             - move_min
-             - move_max
+             - interval_min(5000)
+             - interval_max(10000)
+             - move_min(500)
+             - move_max(1500)
         - sing_mode
-             - interval_min
-             - interval_max
-             - move_min
-             - move_max
+             - interval_min(1000)
+             - interval_max(2000)
+             - move_min(500)
+             - move_max(1500)
 - bluetooth
-    - device_name<br>Specify the device name of the Bluetooth speaker.
-    - starting_state<br>Specify whether Bluetooth mode is enabled or disabled at startup.
+    - device_name(M5Stack_BTSPK)<br>Specify the device name of the Bluetooth speaker.
+    - starting_state("false")<br>Specify whether Bluetooth mode is enabled or disabled at startup.
 
-- auto_power_off_time<br>Core2 only. power off after USB power supply is turned off and after a set time elapses. (0 does not power off)
+- auto_power_off_time(0)<br>Core2 only. power off after USB power supply is turned off and after a set time elapses. (0 does not power off)
 
 - balloon<br>Set up callouts.
-    - font_language<br>Specifies the language of the font." JA" or "CN", otherwise Latin font is used.
-    - lyrics<br>Sets lines to be displayed at random in Normal mode. Up to 10 lines.
+    - font_language("JA")<br>Specifies the language of the font." JA" or "CN", otherwise Latin font is used.
+    - lyrics("おはよう","Hello","你好")<br>Sets lines to be displayed at random in Normal mode. Up to 10 lines.
 
 # Usage
 

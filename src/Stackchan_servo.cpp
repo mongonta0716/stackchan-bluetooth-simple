@@ -1,5 +1,5 @@
 // Copyright (c) Takao Akaki
-#include <Stackchan_servo.h>
+#include "Stackchan_servo.h"
 
 #include <ServoEasing.hpp>
 StackchanSERVO::StackchanSERVO() {}

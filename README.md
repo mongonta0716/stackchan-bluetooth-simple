@@ -43,39 +43,38 @@ Arduino-ESP32は2.0.4(Fireのみ2.0.0)で動作確認しています。M5Stack F
 設定用のJSONファイルがないとデフォルト値を利用します。（Core2のPortCへサーボを接続する設定になっています。）
 SDカードに`/json/SC_Config.json`を配置すると自分の設定が利用できます。
 
-初期設定は[JSONファイル](https://github.com/mongonta0716/stackchan-bluetooth-simple/blob/main/data/json/SC_Config.json)を参照してください。
-
+詳しくは[JSONファイル](https://github.com/mongonta0716/stackchan-bluetooth-simple/blob/main/data/json/SC_Config.json)を参照してください。
 
 ## 設定項目
-
+(カッコ内)は初期値
 - servo
     - pin
-        - x<br> X軸のGPIOを指定
-        - y<br> Y軸のGPIOを指定
+        - x(Core1 22, Core2 13)<br> X軸のGPIOを指定
+        - y(Core1 21, Core2 14)<br> Y軸のGPIOを指定
     - offset<br>サーボの軸が90°にしたときにズレを修正するパラメータ
-        - x<br> X軸のオフセット値を設定
-        - y<br> Y軸のオフセット値を設定
+        - x<br> X軸のオフセット値を設定(0)
+        - y<br> Y軸のオフセット値を設定(0)
 
     - speed<br>待機時とBluetoothスピーカーで音が出ているときの待機時間とサーボの移動時間を指定します。最小値と最大値で範囲を指定して、ランダムの値を使用します。
         - normal_mode
-             - interval_min
-             - interval_max
-             - move_min
-             - move_max
+             - interval_min(5000)
+             - interval_max(10000)
+             - move_min(500)
+             - move_max(1500)
         - sing_mode
-             - interval_min
-             - interval_max
-             - move_min
-             - move_max
+             - interval_min(1000)
+             - interval_max(2000)
+             - move_min(500)
+             - move_max(1500)
 - bluetooth
-    - device_name<br>Bluetoothスピーカーのデバイス名を指定します。
-    - starting_state<br>起動時にBluetoothモードにするかどうかを指定します。
+    - device_name(M5Stack_BTSPK)<br>Bluetoothスピーカーのデバイス名を指定します。
+    - starting_state(false)<br>起動時にBluetoothモードにするかどうかを指定します。
 
-- auto_power_off_time<br>Core2のみ。USBの電源供給がOFFになったあと設定した時間が経過すると電源OFFになります。（0は電源OFFしない）
+- auto_power_off_time(0)<br>Core2のみ。USBの電源供給がOFFになったあと設定した時間が経過すると電源OFFになります。（0は電源OFFしない）
 
 - balloon<br>吹き出しの設定をします。
-    - font_language<br>フォントの言語を指定します。"JA"か"CN"、指定しないとラテンフォントを使用します。
-    - lyrics<br>ノーマルモード時にランダムで表示するセリフを設定します。最大10個まで。
+    - font_language("JA")<br>フォントの言語を指定します。"JA"か"CN"、指定しないとラテンフォントを使用します。
+    - lyrics("こんにちは",”Hello”,"你好")<br>ノーマルモード時にランダムで表示するセリフを設定します。最大10個まで。
 
 # 使い方
 
