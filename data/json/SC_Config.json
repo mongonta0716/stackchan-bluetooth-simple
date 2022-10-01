@@ -2,7 +2,7 @@
     "comment" : "The comment item is only a description and does not need to be changed.",
     "servo" : {
         "pin" : {
-            "commnts" : [
+            "comments" : [
                 "ServoPin",
                 "Core1 PortA X:22,Y:21 PortC X:16,Y:17",
                 "Core2 PortA X:33,Y:34 PortC X:13,Y:14",

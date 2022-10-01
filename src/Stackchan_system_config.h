@@ -1,7 +1,6 @@
 #ifndef __STACKCHAN_SYSTEM_CONFIG_H__
 #define __STACKCHAN_SYSTEM_CONFIG_H__
 
-#define ARDUINOJSON_ENABLE_COMMENTS 1
 #include <ArduinoJson.h>
 #include <M5Unified.h>
 

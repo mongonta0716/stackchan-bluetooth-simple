@@ -39,7 +39,7 @@ void StackchanSystemConfig::loadConfig(fs::FS& fs, const char *json_filename) {
     File file = fs.open(json_filename);
     if (file) {
         int res = file.available();
-        DynamicJsonDocument doc(1024);
+        DynamicJsonDocument doc(2048);
         DeserializationError error = deserializeJson(doc, file);
         if (error) {
             Serial.printf("json file read error: %s\n", json_filename);
