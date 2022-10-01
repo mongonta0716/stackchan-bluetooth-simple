@@ -40,57 +40,46 @@ See [platformio.ini](https://github.com/mongonta0716/stackchan-bluetooth-simple/
 
 - [ESP32-A2DP](https://github.com/pschatzmann/ESP32-A2DP)
 
+- [ArduinoJson](https://github.com/bblanchon/ArduinoJson)
+
 # Settings
+If there is no JSON file for configuration, default values are used. (It is configured to connect servos to PortC of Core2.)
+If you place `/json/SC_Config.json` in SD card, you can use your own settings.
+
+Please refer to [JSON file](https://github.com/mongonta0716/stackchan-bluetooth-simple/blob/main/data/json/SC_Config.json) for the default settings.
 
 Please rewrite [setting area](https://github.com/mongonta0716/stackchan-bluetooth-simple/blob/main/src/main.cpp#L21-L96) in the source for the initial settings.
 
-## Servo PIN
+## Setting Items
 
-Specify the GPIO to be used.
+- servo
+    - pin
+        - x<br> GPIO No of Servo X
+        - y<br> GPIO No of Servo Y
+    - offset<br>
+        - x<br> Offset x
+        - y<br> Offset y
 
-- SERVO_PIN_X
+    - speed<br>Specify the standby time and servo travel time when the sound is on standby and Bluetooth speaker. Specify a range with minimum and maximum values and use random values.
+        - normal_mode
+             - interval_min
+             - interval_max
+             - move_min
+             - move_max
+        - sing_mode
+             - interval_min
+             - interval_max
+             - move_min
+             - move_max
+- bluetooth
+    - device_name<br>Specify the device name of the Bluetooth speaker.
+    - starting_state<br>Specify whether Bluetooth mode is enabled or disabled at startup.
 
-- SERVO_PIN_Y
+- auto_power_off_time<br>Core2 only. power off after USB power supply is turned off and after a set time elapses. (0 does not power off)
 
-## Servo Initial Settings
-
-Adjusts the angle when the servo is out of alignment by 90°. Specify ± value.
-
-- servo_offset_x
-
-- servo_offset_y
-
-## Servo Speed 
-
-Specify the interval between standby and when sound is emitted by the Bluetooth speaker. (msec)
-Specify a range with a minimum and maximum value and use a random value.
-
-- interval_min, interval_max<br>Waiting time until servo moves (when silent)
-
-- interval_move_min, interval_move_max<br>Time for the servo to move to the next angle (in silence)
-
-- sing_interval_min, sing_interval_max<br>Waiting time for servo to move (when Bluetooth speaker is sounding)
-
-- sing_move_min, sing_move_max<br>サTime for the servo to move to the next angle (when the Bluetooth speaker is sounding)
-
-## Bluetooth Settings
-
-- bt_device_name<br>bluetooth device name
-
-- bluetooth_mode<br>If true, it will enter Bluetooth speaker mode at startup; if false, pressing BtnA will enter Bluetooth mode.
-
-## Auto Power Off(Only Core2)
-
-- auto_power_off_time<br>Time until power is turned off after power supply from USB stops. 0 means no automatic power off.
-
-
-## Serif Settings
-
-When not in Bluetooth mode, the words set below are displayed.
-
-- font_name<br>Specify the font. See [here FontList](https://docs.m5stack.com/en/api/m5gfx/m5gfx_appendix) for available fonts.
-
-- lyrics<br>Randomly displays the set characters.
+- balloon<br>Set up callouts.
+    - font_language<br>Specifies the language of the font." JA" or "CN", otherwise Latin font is used.
+    - lyrics<br>Sets lines to be displayed at random in Normal mode. Up to 10 lines.
 
 # Usage
 

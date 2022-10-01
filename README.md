@@ -25,7 +25,7 @@ Arduino-ESP32は2.0.4(Fireのみ2.0.0)で動作確認しています。M5Stack F
 
 詳しいバージョンについては[platformio.ini](https://github.com/mongonta0716/stackchan-bluetooth-simple/blob/main/platformio.ini)を見てください。
 
-- [M5Stack-Avatar](https://github.com/meganetaaan/m5stack-avatar)<br>2022/8/28現在ライブラリの0.8.0では動かないのでGitHubの最新を利用してください。(setSpeechFontが実装されていません。)
+- [M5Stack-Avatar](https://github.com/meganetaaan/m5stack-avatar)
 
 - [ServoEasing](https://github.com/ArminJo/ServoEasing)
 
@@ -37,56 +37,45 @@ Arduino-ESP32は2.0.4(Fireのみ2.0.0)で動作確認しています。M5Stack F
 
 - [ESP32-A2DP](https://github.com/pschatzmann/ESP32-A2DP)
 
+- [ArduinoJson](https://github.com/bblanchon/ArduinoJson)
+
 # 設定
+設定用のJSONファイルがないとデフォルト値を利用します。（Core2のPortCへサーボを接続する設定になっています。）
+SDカードに`/json/SC_Config.json`を配置すると自分の設定が利用できます。
 
-初期設定はソース内の[設定エリア](https://github.com/mongonta0716/stackchan-bluetooth-simple/blob/main/src/main.cpp#L21-L96)を書き換えてください。
+初期設定は[JSONファイル](https://github.com/mongonta0716/stackchan-bluetooth-simple/blob/main/data/json/SC_Config.json)を参照してください。
 
-## サーボピン
 
-使用するGPIOの番号を指定します。
+## 設定項目
 
-- SERVO_PIN_X
+- servo
+    - pin
+        - x<br> X軸のGPIOを指定
+        - y<br> Y軸のGPIOを指定
+    - offset<br>サーボの軸が90°にしたときにズレを修正するパラメータ
+        - x<br> X軸のオフセット値を設定
+        - y<br> Y軸のオフセット値を設定
 
-- SERVO_PIN_Y
+    - speed<br>待機時とBluetoothスピーカーで音が出ているときの待機時間とサーボの移動時間を指定します。最小値と最大値で範囲を指定して、ランダムの値を使用します。
+        - normal_mode
+             - interval_min
+             - interval_max
+             - move_min
+             - move_max
+        - sing_mode
+             - interval_min
+             - interval_max
+             - move_min
+             - move_max
+- bluetooth
+    - device_name<br>Bluetoothスピーカーのデバイス名を指定します。
+    - starting_state<br>起動時にBluetoothモードにするかどうかを指定します。
 
-## サーボの初期設定
+- auto_power_off_time<br>Core2のみ。USBの電源供給がOFFになったあと設定した時間が経過すると電源OFFになります。（0は電源OFFしない）
 
-サーボの90°がズレている際に角度を調整します。±の値を指定します。
-
-- servo_offset_x
-
-- servo_offset_y
-
-## サーボのスピード
-
-待機時とBluetoothスピーカーで音が出ているときの間隔を指定します。(msec)
-最小値と最大値で範囲を指定して、ランダムの値を使用します。
-
-- interval_min, interval_max<br>サーボが動くまでの待機時間（無音時）
-
-- interval_move_min, interval_move_max<br>サーボが次の角度に移動する時間（無音時）
-
-- sing_interval_min, sing_interval_max<br>サーボが動くまでの待機時間(Bluetoothスピーカーが鳴っているとき)
-
-- sing_move_min, sing_move_max<br>サーボが次の角度に移動する時間(Bluetoothスピーカーが鳴っているとき)
-
-## Bluetoothの設定
-
-- bt_device_name<br>Bluetooth接続時に表示されるデバイス名を指定します。
-
-- bluetooth_mode<br>trueにすると起動時にBluetoothスピーカーモードになります。<br>falseの場合はBtnAを押すとBluetoothモードに入ります。
-
-## 自動電源OFF時間(Core2のみ)
-
-- auto_power_off_time<br>USBからの電源供給が止まった後、電源OFFするまでの時間。0は自動電源OFFしません。
-
-## セリフの設定
-
-Bluetoothモードで無いときは、下記で設定した言葉を表示します。
-
-- font_name<br>フォントを指定します。使用できるフォントは[こちらのFontList](https://docs.m5stack.com/en/api/m5gfx/m5gfx_appendix)を見てください。
-
-- lyrics<br>設定した文字をランダムに表示します。
+- balloon<br>吹き出しの設定をします。
+    - font_language<br>フォントの言語を指定します。"JA"か"CN"、指定しないとラテンフォントを使用します。
+    - lyrics<br>ノーマルモード時にランダムで表示するセリフを設定します。最大10個まで。
 
 # 使い方
 
