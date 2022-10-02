@@ -28,7 +28,7 @@ Arduino-ESP32 is confirmed to work with 2.0.4 (Fire only 2.0.0). M5Stack Fire ha
 
 See [platformio.ini](https://github.com/mongonta0716/stackchan-bluetooth-simple/blob/main/platformio.ini) for detailed version information.
 
-- [M5Stack-Avatar](https://github.com/meganetaaan/m5stack-avatar)<br>As of 2022/8/28, the library 0.8.0 does not work, so please use the latest GitHub version. (setSpeechFont is not implemented.)
+- [M5Stack-Avatar](https://github.com/meganetaaan/m5stack-avatar)
 
 - [ServoEasing](https://github.com/ArminJo/ServoEasing)
 
@@ -57,6 +57,8 @@ Please refer to [JSON file](https://github.com/mongonta0716/stackchan-bluetooth-
 Please rewrite [setting area](https://github.com/mongonta0716/stackchan-bluetooth-simple/blob/main/src/main.cpp#L21-L96) in the source for the initial settings.
 
 ## Setting Items
+
+(Initial values in parentheses)
 
 - servo
     - pin
