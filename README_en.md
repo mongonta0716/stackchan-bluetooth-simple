@@ -42,6 +42,12 @@ See [platformio.ini](https://github.com/mongonta0716/stackchan-bluetooth-simple/
 
 - [ArduinoJson](https://github.com/bblanchon/ArduinoJson)
 
+# Compile Notes
+
+- M5Stack Fire V2.6/M5Stack Basic V2.6<br>When using a TF card, we have confirmed an event that SD.begin() cannot be read at 25MHz. Lower it to 15MHz.
+
+- M5Stack Basic V2.6<br>Please select `env:m5stack-grey` for env when compiling with VSCode+PlatformIO.
+
 # Settings
 If there is no JSON file for configuration, default values are used. (It is configured to connect servos to PortC of Core2.)
 If you place `/json/SC_Config.json` in SD card, you can use your own settings.

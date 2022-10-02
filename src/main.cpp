@@ -170,7 +170,9 @@ void setup(void)
 //cfg.external_spk_detail.omit_spk_hat    = true; // exclude SPK HAT
 
   M5.begin(cfg);
-
+  if (M5.getBoard() == m5::board_t::board_M5Stack) {
+    M5.In_I2C.release();
+  }
 
   { /// custom setting
     auto spk_cfg = M5.Speaker.config();
@@ -188,9 +190,11 @@ void setup(void)
   M5.Speaker.begin();
   M5.Speaker.setVolume(200);
   M5.Speaker.setChannelVolume(200, m5spk_virtual_channel);
-  
-  SD.begin(GPIO_NUM_4, SPI, 25000000);
 
+  // BASICとFIREのV2.6で25MHzだと読み込めないため10MHzまで下げています。
+  SD.begin(GPIO_NUM_4, SPI, 15000000);
+  
+  delay(1000);
   system_config.loadConfig(json_fs, stackchan_system_config_json);
   
   bluetooth_mode = system_config.getBluetoothSetting()->starting_state;
@@ -200,7 +204,7 @@ void setup(void)
               system_config.getServoInfo()->servo_offset_x,
               system_config.getServoInfo()->servo_pin_y, START_DEGREE_VALUE_Y,
               system_config.getServoInfo()->servo_offset_y);
-  delay(3000);
+  delay(2000);
 
   avatar.init(); // start drawing
 

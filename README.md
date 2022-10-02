@@ -39,6 +39,12 @@ Arduino-ESP32は2.0.4(Fireのみ2.0.0)で動作確認しています。M5Stack F
 
 - [ArduinoJson](https://github.com/bblanchon/ArduinoJson)
 
+# コンパイル時の注意
+
+- M5Stack Fire V2.6/M5Stack Basic V2.6<br>TFカードを使用する際にSD.begin()を25MHzでは読み込めない事象を確認しました。15MHzに下げてください。
+
+- M5Stack Basic V2.6<br>VSCode+PlatformIOでコンパイルするときのenvは`env:m5stack-grey`を選択してください。
+
 # 設定
 設定用のJSONファイルがないとデフォルト値を利用します。（Core2のPortCへサーボを接続する設定になっています。）
 SDカードに`/json/SC_Config.json`を配置すると自分の設定が利用できます。
