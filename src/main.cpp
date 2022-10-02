@@ -188,8 +188,6 @@ void setup(void)
 
 
   M5.Speaker.begin();
-  M5.Speaker.setVolume(200);
-  M5.Speaker.setChannelVolume(200, m5spk_virtual_channel);
 
   // BASICとFIREのV2.6で25MHzだと読み込めないため10MHzまで下げています。
   SD.begin(GPIO_NUM_4, SPI, 15000000);
@@ -197,6 +195,9 @@ void setup(void)
   delay(1000);
   system_config.loadConfig(json_fs, stackchan_system_config_json);
   
+  M5.Speaker.setVolume(system_config.getBluetoothSetting()->start_volume);
+  M5.Speaker.setChannelVolume(system_config.getBluetoothSetting()->start_volume, m5spk_virtual_channel);
+
   bluetooth_mode = system_config.getBluetoothSetting()->starting_state;
   Serial.printf("Bluetooth_mode:%s\n", bluetooth_mode ? "true" : "false");
   

@@ -16,6 +16,7 @@ typedef struct ServoInterval {
 typedef struct Bluetooth {
     String device_name;
     bool starting_state;
+    uint8_t start_volume;
 } bluetooth_s;
 
 typedef struct ServoInitialParam {

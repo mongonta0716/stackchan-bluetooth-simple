@@ -82,6 +82,7 @@ Please rewrite [setting area](https://github.com/mongonta0716/stackchan-bluetoot
 - bluetooth
     - device_name(M5Stack_BTSPK)<br>Specify the device name of the Bluetooth speaker.
     - starting_state("false")<br>Specify whether Bluetooth mode is enabled or disabled at startup.
+    - start_volume(100)<br>Initial volume of Bluetooth speaker.
 
 - auto_power_off_time(0)<br>Core2 only. power off after USB power supply is turned off and after a set time elapses. (0 does not power off)
 

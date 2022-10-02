@@ -33,7 +33,8 @@
     },
     "bluetooth" : {
         "device_name" : "M5StackBTSPK",
-        "starting_state" : false
+        "starting_state" : false,
+        "start_volume" : 100
     },
     "comment_auto_power_off_time" : "time(msec) of auto power off(0 is disable.)",
     "auto_power_off_time" : 0,

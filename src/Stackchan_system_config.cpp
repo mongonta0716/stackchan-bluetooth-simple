@@ -39,12 +39,14 @@ void StackchanSystemConfig::setDefaultParameters() {
     _mode_num = 2;
     _bluetooth.device_name = "M5Stack_BTSPK";
     _bluetooth.starting_state = false;
+    _bluetooth.start_volume = 100;
     _auto_power_off_time = 0;
     _font_language_code = "JA";
     _lyrics[0] = "こんにちは";
     _lyrics[1] = "Hello";
     _lyrics[2] = "你好";
-    _lyrics_num = 3;
+    _lyrics[3] = "Bonjour";
+    _lyrics_num = 4;
 }
 
 void StackchanSystemConfig::loadConfig(fs::FS& fs, const char *json_filename) {
@@ -88,6 +90,7 @@ void StackchanSystemConfig::setSystemConfig(DynamicJsonDocument doc) {
 
     _bluetooth.device_name = doc["bluetooth"]["device_name"].as<String>();
     _bluetooth.starting_state = doc["bluetooth"]["starting_state"].as<bool>();
+    _bluetooth.start_volume = doc["bluetooth"]["start_volume"];
 
     _auto_power_off_time = doc["auto_power_off_time"];
     _font_language_code = doc["balloon"]["font_language"].as<String>();
@@ -128,6 +131,7 @@ void StackchanSystemConfig::printAllParameters() {
     Serial.printf("mode_num:%d\n", _mode_num);
     Serial.printf("Bluetooth_device_name:%s\n", _bluetooth.device_name.c_str());
     Serial.printf("Bluetooth_starting_state:%s\n", _bluetooth.starting_state ? "true":"false");
+    Serial.printf("Bluetooth_start_volume:%d\n", _bluetooth.start_volume);
     Serial.printf("auto_power_off_time:%d\n", _auto_power_off_time);
     Serial.printf("font_language:%s\n", _font_language_code);
     for (int i=0;i<_lyrics_num;i++) {

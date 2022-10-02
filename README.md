@@ -75,6 +75,7 @@ SDカードに`/json/SC_Config.json`を配置すると自分の設定が利用�
 - bluetooth
     - device_name(M5Stack_BTSPK)<br>Bluetoothスピーカーのデバイス名を指定します。
     - starting_state(false)<br>起動時にBluetoothモードにするかどうかを指定します。
+    - start_volume(100)<br>Bluetoothスピーカーの初期値を設定
 
 - auto_power_off_time(0)<br>Core2のみ。USBの電源供給がOFFになったあと設定した時間が経過すると電源OFFになります。（0は電源OFFしない）
 
