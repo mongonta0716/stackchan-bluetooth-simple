@@ -1,8 +1,9 @@
 #ifndef __STACKCHAN_SYSTEM_CONFIG_H__
 #define __STACKCHAN_SYSTEM_CONFIG_H__
 
-#include <ArduinoJson.h>
+//#include <ArduinoJson.h>
 #include <M5Unified.h>
+#include <ArduinoYaml.h>
 
 typedef struct ServoInterval {
     // 下記のminとmaxの間でランダムの値を取ります。

@@ -1,5 +1,6 @@
 #include "Stackchan_system_config.h"
 
+
 StackchanSystemConfig::StackchanSystemConfig() {
 
 };
