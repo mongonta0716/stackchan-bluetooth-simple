@@ -54,7 +54,7 @@ class StackchanSystemConfig {
     public:
         StackchanSystemConfig();
         ~StackchanSystemConfig();
-        void loadConfig(fs::FS& fs, const char *json_filename);
+        void loadConfig(fs::FS& fs, const char *yaml_filename);
 
         void printAllParameters();
 

@@ -4,6 +4,7 @@
 
 #include <Arduino.h>
 
+#include <Ticker.h>
 #include <SD.h>
 #include <M5Unified.h>
 #include <WiFi.h>
@@ -26,7 +27,7 @@ StackchanSERVO servo;
 
 fs::FS json_fs = SD; // JSONファイルの収納場所(SPIFFS or SD)
 StackchanSystemConfig system_config;
-const char* stackchan_system_config_json = "/json/SC_Config.json";
+const char* stackchan_system_config_yaml = "/yaml/SC_Config.yaml";
 
 bool bluetooth_mode = false; 
 
@@ -193,7 +194,7 @@ void setup(void)
   SD.begin(GPIO_NUM_4, SPI, 15000000);
   
   delay(1000);
-  system_config.loadConfig(json_fs, stackchan_system_config_json);
+  system_config.loadConfig(json_fs, stackchan_system_config_yaml);
   
   M5.Speaker.setVolume(system_config.getBluetoothSetting()->start_volume);
   M5.Speaker.setChannelVolume(system_config.getBluetoothSetting()->start_volume, m5spk_virtual_channel);

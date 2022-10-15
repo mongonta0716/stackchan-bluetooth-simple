@@ -50,17 +50,17 @@ void StackchanSystemConfig::setDefaultParameters() {
     _lyrics_num = 4;
 }
 
-void StackchanSystemConfig::loadConfig(fs::FS& fs, const char *json_filename) {
-    Serial.printf("----- StackchanSystemConfig::loadConfig:%s\n", json_filename);
-    File file = fs.open(json_filename);
+void StackchanSystemConfig::loadConfig(fs::FS& fs, const char *yaml_filename) {
+    Serial.printf("----- StackchanSystemConfig::loadConfig:%s\n", yaml_filename);
+    File file = fs.open(yaml_filename);
     if (file) {
-        int res = file.available();
         DynamicJsonDocument doc(2048);
-        DeserializationError error = deserializeJson(doc, file);
-        if (error) {
-            Serial.printf("json file read error: %s\n", json_filename);
-            Serial.printf("error%s\n", error.c_str());
+        auto err = deserializeYml( doc, file);
+        if (err) {
+            Serial.printf("yaml file read error: %s\n", yaml_filename);
+            Serial.printf("error%s\n", err.c_str());
         }
+        serializeJsonPretty(doc, Serial);
         setSystemConfig(doc);
     } else {
         Serial.println("ConfigFile Not Found. Default Parameters used.");
@@ -90,7 +90,7 @@ void StackchanSystemConfig::setSystemConfig(DynamicJsonDocument doc) {
     _mode_num = i;
 
     _bluetooth.device_name = doc["bluetooth"]["device_name"].as<String>();
-    _bluetooth.starting_state = doc["bluetooth"]["starting_state"].as<bool>();
+    _bluetooth.starting_state = doc["bluetooth"]["starting_state"];//.as<bool>();
     _bluetooth.start_volume = doc["bluetooth"]["start_volume"];
 
     _auto_power_off_time = doc["auto_power_off_time"];

@@ -5,6 +5,7 @@
 
 // コンパイル時にServoEasing.hppをIncludeしてくださいという警告が出ますが、hppにすると二重定義のリンクエラーが出ます。
 // その対処でStackchan_servo.hはh, Stackchan_servo.cppはhppをincludeしています。
+#define SUPPRESS_HPP_WARNING
 #include <ServoEasing.h>
 
 enum Motion {

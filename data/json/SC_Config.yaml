@@ -1,0 +1,39 @@
+servo: 
+  pin: 
+    # ServoPin
+    # Core1 PortA X:22,Y:21 PortC X:16,Y:17
+    # Core2 PortA X:33,Y:34 PortC X:13,Y:14
+    # Stack-chanPCB Core1 X:5,Y:2 Core2 X:27,Y19
+    x: "22"
+    y: "21"
+  offset: 
+    # Specified by +- from 90 degree during servo initialization
+    x: "0"
+    y: "0"
+  speed: 
+    normal_mode: 
+      interval_min: "3000"
+      interval_max: "6000"
+      move_min: "500"
+      move_max: "1500"
+    sing_mode: 
+      interval_min: "500"
+      interval_max: "1000"
+      move_min: "500"
+      move_max: "1000"
+bluetooth: 
+  device_name: "M5StackBTSPK"
+  starting_state: false
+  start_volume: "100"
+auto_power_off_time: "0" # time(msec) of auto power off(0 is disable.)
+balloon: 
+  font_language: "JA" # "JA or CN or Default"
+  lyrics: # A maximum of 10 can be specified.
+  - "こんにちは"
+  - "Hello"
+  - "Bonjour"
+  - "你好"
+  - "私はスタックチャン"
+  - "我是Stack-chan"
+  - "I'm Stack-chan"
+  - "Je suis Stack-chan"
