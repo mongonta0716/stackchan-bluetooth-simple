@@ -12,8 +12,8 @@ StackchanSystemConfig::~StackchanSystemConfig() {
 void StackchanSystemConfig::setDefaultParameters() {
     switch(M5.getBoard()) {
         case m5::board_t::board_M5StackCore2:
-            _servo.servo_pin_x = 13;
-            _servo.servo_pin_y = 14;
+            _servo.servo_pin_x = 33;
+            _servo.servo_pin_y = 32;
             break;
         case m5::board_t::board_M5Stack:
             _servo.servo_pin_x = 22;

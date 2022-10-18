@@ -42,19 +42,19 @@ See [platformio.ini](https://github.com/mongonta0716/stackchan-bluetooth-simple/
 
 - [ArduinoJson](https://github.com/bblanchon/ArduinoJson)
 
+- [YAMLDuino](https://github.com/tobozo/YAMLDuino)
+
 # Compile Notes
 
-- M5Stack Fire V2.6/M5Stack Basic V2.6<br>When using a TF card, we have confirmed an event that SD.begin() cannot be read at 25MHz. Lower it to 15MHz.
+- M5Stack Fire V2.6/M5Stack Basic V2.6<br>When using a TF card, we have confirmed an event that SD.begin() cannot be read at 20MHz. Lower it to 15MHz.
 
 - M5Stack Basic V2.6<br>Please select `env:m5stack-grey` for env when compiling with VSCode+PlatformIO.
 
 # Settings
-If there is no JSON file for configuration, default values are used. (It is configured to connect servos to PortC of Core2.)
-If you place `/json/SC_Config.json` in SD card, you can use your own settings.
+If there is no YAML file for configuration on the SD card, the default values are used. (It is configured to connect servos to PortA.)
+If you put `/yaml/SC_Config.yaml` in your SD card, you can use your own settings.
 
-Please refer to [JSON file](https://github.com/mongonta0716/stackchan-bluetooth-simple/blob/main/data/json/SC_Config.json) for the default settings.
-
-Please rewrite [setting area](https://github.com/mongonta0716/stackchan-bluetooth-simple/blob/main/src/main.cpp#L21-L96) in the source for the initial settings.
+Please refer to [YAML file](https://github.com/mongonta0716/stackchan-bluetooth-simple/blob/main/data/yaml/SC_Config.yaml) for the default settings.
 
 ## Setting Items
 
@@ -62,8 +62,8 @@ Please rewrite [setting area](https://github.com/mongonta0716/stackchan-bluetoot
 
 - servo
     - pin
-        - x(Core1 22, Core2 13)<br> GPIO No of Servo X
-        - y(Core1 21, Core2 14)<br> GPIO No of Servo Y
+        - x(Core1 22, Core2 33)<br> GPIO No of Servo X
+        - y(Core1 21, Core2 32)<br> GPIO No of Servo Y
     - offset<br>
         - x(0)<br> Offset x
         - y(0)<br> Offset y
@@ -88,7 +88,7 @@ Please rewrite [setting area](https://github.com/mongonta0716/stackchan-bluetoot
 
 - balloon<br>Set up callouts.
     - font_language("JA")<br>Specifies the language of the font." JA" or "CN", otherwise Latin font is used.
-    - lyrics("おはよう","Hello","你好")<br>Sets lines to be displayed at random in Normal mode. Up to 10 lines.
+    - lyrics("おはよう","Hello","你好","Bonjour")<br>Sets lines to be displayed at random in Normal mode. Up to 10 lines.
 
 # Usage
 

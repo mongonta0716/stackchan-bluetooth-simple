@@ -43,15 +43,15 @@ Arduino-ESP32は2.0.4(Fireのみ2.0.0)で動作確認しています。M5Stack F
 
 # コンパイル時の注意
 
-- M5Stack Fire V2.6/M5Stack Basic V2.6<br>TFカードを使用する際にSD.begin()を25MHzでは読み込めない事象を確認しました。15MHzに下げてください。
+- M5Stack Fire V2.6/M5Stack Basic V2.6<br>TFカードを使用する際にSD.begin()を20MHz以上では読み込めない事象を確認しました。15MHzに下げています。
 
 - M5Stack Basic V2.6<br>VSCode+PlatformIOでコンパイルするときのenvは`env:m5stack-grey`を選択してください。
 
 # 設定
-設定用のJSONファイルがないとデフォルト値を利用します。（Core2のPortCへサーボを接続する設定になっています。）
+SDカードに設定用のYAMLファイルがないとデフォルト値を利用します。（PortAへサーボを接続する設定になっています。）
 SDカードに`/yaml/SC_Config.yaml`を配置すると自分の設定が利用できます。
 
-**2022/10/18にJSONからYAMLへ変更しました。JSONからYAMLへのコンバートは[JSON から YAML コンバータ](https://www.site24x7.com/ja/tools/json-to-yaml.html)にて可能です。**
+**2022/10/18にJSONからYAMLへ変更しました。JSONからYAMLへのコンバートは[JSON から YAML コンバータ](https://www.site24x7.com/ja/tools/json-to-yaml.html)にて可能です。**<br>コメントの扱いが変わっているので注意してください。
 
 詳しくは[YAMLファイル](https://github.com/mongonta0716/stackchan-bluetooth-simple/blob/main/data/yaml/SC_Config.yaml)を参照してください。
 
@@ -59,11 +59,11 @@ SDカードに`/yaml/SC_Config.yaml`を配置すると自分の設定が利用�
 (カッコ内)は初期値
 - servo
     - pin
-        - x(Core1 22, Core2 13)<br> X軸のGPIOを指定
-        - y(Core1 21, Core2 14)<br> Y軸のGPIOを指定
+        - x(Core1 22, Core2 33)<br> X軸のGPIOを指定
+        - y(Core1 21, Core2 32)<br> Y軸のGPIOを指定
     - offset<br>サーボの軸が90°にしたときにズレを修正するパラメータ
-        - x<br> X軸のオフセット値を設定(0)
-        - y<br> Y軸のオフセット値を設定(0)
+        - x(0)<br> X軸のオフセット値を設定
+        - y(0)<br> Y軸のオフセット値を設定
 
     - speed<br>待機時とBluetoothスピーカーで音が出ているときの待機時間とサーボの移動時間を指定します。最小値と最大値で範囲を指定して、ランダムの値を使用します。
         - normal_mode
@@ -85,7 +85,7 @@ SDカードに`/yaml/SC_Config.yaml`を配置すると自分の設定が利用�
 
 - balloon<br>吹き出しの設定をします。
     - font_language("JA")<br>フォントの言語を指定します。"JA"か"CN"、指定しないとラテンフォントを使用します。
-    - lyrics("こんにちは",”Hello”,"你好")<br>ノーマルモード時にランダムで表示するセリフを設定します。最大10個まで。
+    - lyrics("こんにちは",”Hello”,"你好","Bonjour")<br>ノーマルモード時にランダムで表示するセリフを設定します。最大10個まで。
 
 # 使い方
 
