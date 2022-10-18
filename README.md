@@ -39,6 +39,8 @@ Arduino-ESP32は2.0.4(Fireのみ2.0.0)で動作確認しています。M5Stack F
 
 - [ArduinoJson](https://github.com/bblanchon/ArduinoJson)
 
+- [YAMLDuino](https://github.com/tobozo/YAMLDuino)
+
 # コンパイル時の注意
 
 - M5Stack Fire V2.6/M5Stack Basic V2.6<br>TFカードを使用する際にSD.begin()を25MHzでは読み込めない事象を確認しました。15MHzに下げてください。
@@ -47,9 +49,11 @@ Arduino-ESP32は2.0.4(Fireのみ2.0.0)で動作確認しています。M5Stack F
 
 # 設定
 設定用のJSONファイルがないとデフォルト値を利用します。（Core2のPortCへサーボを接続する設定になっています。）
-SDカードに`/json/SC_Config.json`を配置すると自分の設定が利用できます。
+SDカードに`/yaml/SC_Config.yaml`を配置すると自分の設定が利用できます。
 
-詳しくは[JSONファイル](https://github.com/mongonta0716/stackchan-bluetooth-simple/blob/main/data/json/SC_Config.json)を参照してください。
+**2022/10/18にJSONからYAMLへ変更しました。JSONからYAMLへのコンバートは[JSON から YAML コンバータ](https://www.site24x7.com/ja/tools/json-to-yaml.html)にて可能です。**
+
+詳しくは[YAMLファイル](https://github.com/mongonta0716/stackchan-bluetooth-simple/blob/main/data/yaml/SC_Config.yaml)を参照してください。
 
 ## 設定項目
 (カッコ内)は初期値
