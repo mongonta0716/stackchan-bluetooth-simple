@@ -288,26 +288,25 @@ void loop(void)
     delay(200);
     M5.Speaker.tone(2000, 100);
   }
-#if not(defined(ARDUINO_M5STACK_FIRE) || defined(ARDUINO_M5Stack_Core_ESP32)) // FireはAxp192ではないのとI2Cが使えないので制御できません。
-  if (M5.Power.Axp192.getACINVolatge() < 3.0f) {
-    // USBからの給電が停止したとき
-    // Serial.println("USBPowerUnPlugged.");
-    M5.Power.setLed(0);
-    if ((system_config.getAutoPowerOffTime() > 0) and (last_discharge_time == 0)) {
-      last_discharge_time = millis();
-    } else if ((system_config.getAutoPowerOffTime() > 0) 
-               and ((millis() - last_discharge_time) > system_config.getAutoPowerOffTime())) {
-      M5.Power.powerOff();
-    }
-  } else {
-    //Serial.println("USBPowerPlugged.");
-    M5.Power.setLed(80);
-    if (last_discharge_time > 0) {
-      last_discharge_time = 0;
+  if (M5.getBoard() == m5::board_t::board_M5StackCore2) {
+    if (M5.Power.Axp192.getACINVolatge() < 3.0f) {
+      // USBからの給電が停止したとき
+      // Serial.println("USBPowerUnPlugged.");
+      M5.Power.setLed(0);
+      if ((system_config.getAutoPowerOffTime() > 0) and (last_discharge_time == 0)) {
+        last_discharge_time = millis();
+      } else if ((system_config.getAutoPowerOffTime() > 0) 
+                and ((millis() - last_discharge_time) > system_config.getAutoPowerOffTime())) {
+        M5.Power.powerOff();
+      }
+    } else {
+      //Serial.println("USBPowerPlugged.");
+      M5.Power.setLed(80);
+      if (last_discharge_time > 0) {
+        last_discharge_time = 0;
+      }
     }
   }
-#endif
-
 }
 
 #if !defined ( ARDUINO )
