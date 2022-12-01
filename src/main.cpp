@@ -7,6 +7,7 @@
 #include <Ticker.h>
 #include <SD.h>
 #include <M5Unified.h>
+#include <M5UnitOLED.h>
 #include <WiFi.h>
 #include <WiFiUdp.h>
 #include <esp_wifi.h>
@@ -17,6 +18,14 @@
 using namespace m5avatar;
 Avatar avatar;
 StackchanSERVO servo;
+
+M5UnitOLED oled;
+M5Canvas canvas(&oled);
+
+static constexpr char text[] = "日本代表頑張れ！！！";
+static constexpr size_t textlen = sizeof(text) / sizeof(text[0]);
+int textpos = 0;
+int scrollstep = 2;
 
 #include "Stackchan_system_config.h"
 
@@ -49,6 +58,29 @@ static BluetoothA2DPSink_M5Speaker a2dp_sink = { &M5.Speaker, m5spk_virtual_chan
 static fft_t fft;
 static constexpr size_t WAVE_SIZE = 320;
 static int16_t raw_data[WAVE_SIZE * 2];
+
+void oledLoop(void *args) {
+  for(;;) {
+    int32_t cursor_x = canvas.getCursorX() - scrollstep;
+    if (cursor_x <= 0)
+    {
+      textpos = 0;
+      cursor_x = oled.width();
+    }
+
+    canvas.setCursor(cursor_x, 0);
+    canvas.scroll(-scrollstep, 0);
+    while (textpos < textlen && cursor_x <= oled.width())
+    {
+      canvas.print(text[textpos++]);
+      cursor_x = canvas.getCursorX();
+    }
+    oled.waitDisplay();
+    canvas.pushSprite(&oled, 0, (oled.height() - canvas.height()) >> 1);
+    vTaskDelay(50/portTICK_PERIOD_MS);
+  }
+}
+
 
 void servoLoop(void *args) {
   long move_time = 0;
@@ -224,6 +256,21 @@ void setup(void)
   } else {
     avatar.setSpeechText("Normal Mode");
   }
+  oled.init();
+  oled.setRotation(3);
+  canvas.setColorDepth(1); // mono color
+  canvas.setFont(&fonts::lgfxJapanMinchoP_32);
+  canvas.setTextWrap(false);
+  canvas.setTextSize(2);
+  canvas.createSprite(oled.width() + 64, 72);
+
+  xTaskCreateUniversal(oledLoop
+                      , "gfxLoop"
+                      , 4096
+                      , NULL 
+                      , 8
+                      , NULL
+                      , PRO_CPU_NUM);
 
 
 }
