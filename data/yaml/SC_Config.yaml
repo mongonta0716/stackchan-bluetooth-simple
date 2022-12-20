@@ -3,7 +3,7 @@ servo:
     # ServoPin
     # Core1 PortA X:22,Y:21 PortC X:16,Y:17
     # Core2 PortA X:33,Y:32 PortC X:13,Y:14
-    # Stack-chanPCB Core1 X:5,Y:2 Core2 X:27,Y19
+    # Stack-chanPCB Core1 X:5,Y:2 Core2 X:19,Y27
     x: 22
     y: 21
   offset: 
