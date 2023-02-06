@@ -12,21 +12,25 @@ StackchanSystemConfig::~StackchanSystemConfig() {
 void StackchanSystemConfig::setDefaultParameters() {
     switch(M5.getBoard()) {
         case m5::board_t::board_M5StackCore2:
-            _servo.servo_pin_x = 33;
-            _servo.servo_pin_y = 32;
+            _servo[AXIS_X].pin = 33;
+            _servo[AXIS_Y].pin = 32;
             break;
         case m5::board_t::board_M5Stack:
-            _servo.servo_pin_x = 22;
-            _servo.servo_pin_y = 21;
+            _servo[AXIS_X].pin = 22;
+            _servo[AXIS_Y].pin = 21;
             break;
         default:
             Serial.printf("UnknownBoard:%d\n", M5.getBoard());
-            _servo.servo_pin_x = 22;
-            _servo.servo_pin_y = 21;
+            _servo[AXIS_X].pin = 22;
+            _servo[AXIS_Y].pin = 21;
             break;
     }
-    _servo.servo_offset_x = 0;
-    _servo.servo_offset_y = 0;
+    _servo[AXIS_X].offset = 0;
+    _servo[AXIS_X].lower_limit = 0;
+    _servo[AXIS_X].upper_limit = 180;
+    _servo[AXIS_Y].offset = 0;
+    _servo[AXIS_Y].lower_limit = 50;
+    _servo[AXIS_Y].upper_limit = 90;
     _servo_interval[0].mode_name = "normal";
     _servo_interval[0].interval_min = 5000;
     _servo_interval[0].interval_max = 10000;
@@ -72,12 +76,16 @@ void StackchanSystemConfig::loadConfig(fs::FS& fs, const char *yaml_filename) {
 
 void StackchanSystemConfig::setSystemConfig(DynamicJsonDocument doc) {
     JsonObject servo = doc["servo"];
-    _servo.servo_pin_x = servo["pin"]["x"];
-    _servo.servo_pin_y = servo["pin"]["y"];
+    _servo[AXIS_X].pin = servo["pin"]["x"];
+    _servo[AXIS_Y].pin = servo["pin"]["y"];
 
-    _servo.servo_offset_x = servo["offset"]["x"];
-    _servo.servo_offset_y = servo["offset"]["y"];
+    _servo[AXIS_X].offset = servo["offset"]["x"];
+    _servo[AXIS_Y].offset = servo["offset"]["y"];
 
+    _servo[AXIS_X].lower_limit = servo["lower_limit"]["x"];
+    _servo[AXIS_X].upper_limit = servo["upper_limit"]["x"];
+    _servo[AXIS_Y].lower_limit = servo["lower_limit"]["y"];
+    _servo[AXIS_Y].upper_limit = servo["upper_limit"]["y"];
     int i = 0;
     for (JsonPair servo_speed_item : servo["speed"].as<JsonObject>()) {
         _servo_interval[i].mode_name = servo_speed_item.key().c_str();
@@ -118,10 +126,10 @@ const lgfx::IFont* StackchanSystemConfig::getFont() {
 } 
 
 void StackchanSystemConfig::printAllParameters() {
-    Serial.printf("servo:pin_x:%d\n", _servo.servo_pin_x);
-    Serial.printf("servo:pin_y:%d\n", _servo.servo_pin_y);
-    Serial.printf("servo:offset_x:%d\n", _servo.servo_offset_x);
-    Serial.printf("servo:offset_y:%d\n", _servo.servo_offset_y);
+    Serial.printf("servo:pin_x:%d\n", _servo[AXIS_X].pin);
+    Serial.printf("servo:pin_y:%d\n", _servo[AXIS_Y].pin);
+    Serial.printf("servo:offset_x:%d\n", _servo[AXIS_X].offset);
+    Serial.printf("servo:offset_y:%d\n", _servo[AXIS_Y].offset);
     for (int i=0;i<_mode_num;i++) {
         Serial.printf("mode:%s\n", _servo_interval[i].mode_name);
         Serial.printf("interval_min:%d\n", _servo_interval[i].interval_min);

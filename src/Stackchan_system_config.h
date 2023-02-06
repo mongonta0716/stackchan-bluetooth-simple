@@ -5,6 +5,8 @@
 #include <M5Unified.h>
 #include <ArduinoYaml.h>
 
+#include "Stackchan_servo.h"
+
 typedef struct ServoInterval {
     // 下記のminとmaxの間でランダムの値を取ります。
     const char *mode_name;
@@ -21,16 +23,11 @@ typedef struct Bluetooth {
 } bluetooth_s;
 
 typedef struct ServoInitialParam {
-        uint8_t servo_pin_x;
-        uint8_t servo_pin_y;
-        uint8_t servo_offset_x;
-        uint8_t servo_offset_y;
+        uint8_t pin;
+        uint8_t offset;
+        uint8_t upper_limit;
+        uint8_t lower_limit;
 } servo_initial_param_s;
-
-enum servo_axis {
-    AXIS_X,
-    AXIS_Y
-};
 
 enum AvatarMode {
     NORMAL,
@@ -39,7 +36,7 @@ enum AvatarMode {
 
 class StackchanSystemConfig {
     protected:
-        servo_initial_param_s _servo;
+        servo_initial_param_s _servo[2];
         servo_interval_s _servo_interval[2];
         uint8_t _mode_num;
         bluetooth_s _bluetooth;
@@ -58,7 +55,7 @@ class StackchanSystemConfig {
 
         void printAllParameters();
 
-        servo_initial_param_s* getServoInfo() { return &_servo; }
+        servo_initial_param_s* getServoInfo(uint8_t servo_axis_no) { return &_servo[servo_axis_no]; }
         servo_interval_s* getServoInterval(AvatarMode avatar_mode) { return &_servo_interval[avatar_mode]; }
         bluetooth_s* getBluetoothSetting() { return &_bluetooth; }
         String* getLyric(uint8_t no) { return &_lyrics[no]; }

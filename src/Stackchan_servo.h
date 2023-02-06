@@ -17,20 +17,24 @@ enum Motion {
     test = 99,      // テスト用
 };
 
-
+enum ServoAxis {
+    AXIS_X,
+    AXIS_Y
+};
 
 typedef struct ServoParam {
-    int servo_pin;                    // サーボのピン番号
+    int pin;                    // サーボのピン番号
     int8_t start_degree;              // 初期角度
     int8_t offset;                    // オフセット（90°からの+-）
     int8_t degree;                    // 角度
     uint32_t millis_for_move;         // 移動時間(msec)
+    uint8_t lower_limit;              // サーボ角度の下限
+    uint8_t upper_limit;              // サーボ角度の上限
 } servo_param_s;
 
 
 typedef struct  StackchanServo{
-    servo_param_s x;
-    servo_param_s y;
+    servo_param_s servo[2];
 } stackchan_servo_initial_param_s;
 
 class StackchanSERVO {
@@ -43,8 +47,8 @@ class StackchanSERVO {
         StackchanSERVO();
         ~StackchanSERVO();
         void begin(stackchan_servo_initial_param_s init_params);
-        void begin(int servo_pin_x, int8_t start_degree_x, int8_t offset_x,
-                   int servo_pin_y, int8_t start_degree_y, int8_t offset_y );
+        void begin(int servo_pin_x, int8_t start_degree_x, int8_t offset_x, 
+                   int servo_pin_y, int8_t start_degree_y, int8_t offset_y);
         void moveX(int x, uint32_t millis_for_move = 0);
         void moveY(int y, uint32_t millis_for_move = 0);
         void moveXY(int x, int y, uint32_t millis_for_move);

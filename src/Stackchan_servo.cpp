@@ -8,14 +8,14 @@ StackchanSERVO::~StackchanSERVO() {}
 
 
 void StackchanSERVO::attachServos() {
-  if (_servo_x.attach(_init_param.x.servo_pin, 
-                      _init_param.x.start_degree + _init_param.x.offset,
+  if (_servo_x.attach(_init_param.servo[AXIS_X].pin, 
+                      _init_param.servo[AXIS_X].start_degree + _init_param.servo[AXIS_X].offset,
                       DEFAULT_MICROSECONDS_FOR_0_DEGREE,
                       DEFAULT_MICROSECONDS_FOR_180_DEGREE)) {
     Serial.print("Error attaching servo x");
   }
-  if (_servo_y.attach(_init_param.y.servo_pin, 
-                      _init_param.y.start_degree + _init_param.y.offset,
+  if (_servo_y.attach(_init_param.servo[AXIS_Y].pin, 
+                      _init_param.servo[AXIS_Y].start_degree + _init_param.servo[AXIS_Y].offset,
                       DEFAULT_MICROSECONDS_FOR_0_DEGREE,
                       DEFAULT_MICROSECONDS_FOR_180_DEGREE)) {
     Serial.print("Error attaching servo x");
@@ -32,43 +32,43 @@ void StackchanSERVO::begin(stackchan_servo_initial_param_s init_param) {
 
 void StackchanSERVO::begin(int servo_pin_x, int8_t start_degree_x, int8_t offset_x, 
                            int servo_pin_y, int8_t start_degree_y, int8_t offset_y) {
-  _init_param.x.servo_pin    = servo_pin_x;
-  _init_param.x.start_degree = start_degree_x;
-  _init_param.x.offset       = offset_x;
-  _init_param.y.servo_pin    = servo_pin_y;
-  _init_param.y.start_degree = start_degree_y;
-  _init_param.y.offset       = offset_y;
+  _init_param.servo[AXIS_X].pin          = servo_pin_x;
+  _init_param.servo[AXIS_X].start_degree = start_degree_x;
+  _init_param.servo[AXIS_X].offset       = offset_x;
+  _init_param.servo[AXIS_Y].pin          = servo_pin_y;
+  _init_param.servo[AXIS_Y].start_degree = start_degree_y;
+  _init_param.servo[AXIS_Y].offset       = offset_y;
   attachServos();
 }
 
 void StackchanSERVO::moveX(int x, uint32_t millis_for_move) {
   if (millis_for_move == 0) {
-    _servo_x.easeTo(x + _init_param.x.offset);
+    _servo_x.easeTo(x + _init_param.servo[AXIS_X].offset);
   } else {
-    _servo_x.easeToD(x + _init_param.x.offset, millis_for_move);
+    _servo_x.easeToD(x + _init_param.servo[AXIS_X].offset, millis_for_move);
   }
 }
 
 void StackchanSERVO::moveX(servo_param_s servo_param_x) {
-  _init_param.x.offset = servo_param_x.offset;
+  _init_param.servo[AXIS_X].offset = servo_param_x.offset;
   moveX(servo_param_x.degree, servo_param_x.millis_for_move);
 }
 
 void StackchanSERVO::moveY(int y, uint32_t millis_for_move) {
   if (millis_for_move == 0) {
-    _servo_y.easeTo(y + _init_param.y.offset);
+    _servo_y.easeTo(y + _init_param.servo[AXIS_Y].offset);
   } else {
-    _servo_y.easeToD(y + _init_param.y.offset, millis_for_move);
+    _servo_y.easeToD(y + _init_param.servo[AXIS_Y].offset, millis_for_move);
   }
 }
 
 void StackchanSERVO::moveY(servo_param_s servo_param_y) {
-  _init_param.y.offset = servo_param_y.offset;
+  _init_param.servo[AXIS_Y].offset = servo_param_y.offset;
   moveX(servo_param_y.degree, servo_param_y.millis_for_move);
 }
 void StackchanSERVO::moveXY(int x, int y, uint32_t millis_for_move) {
-  _servo_x.setEaseToD(x + _init_param.x.offset, millis_for_move);
-  _servo_y.setEaseToD(y + _init_param.y.offset, millis_for_move);
+  _servo_x.setEaseToD(x + _init_param.servo[AXIS_X].offset, millis_for_move);
+  _servo_y.setEaseToD(y + _init_param.servo[AXIS_Y].offset, millis_for_move);
   synchronizeAllServosStartAndWaitForAllServosToStop();
 }
 
@@ -120,5 +120,5 @@ void StackchanSERVO::motion(Motion motion_number) {
             break;
     }
     delay(1000);
-    moveXY(_init_param.x.start_degree, _init_param.y.start_degree, 1000);
+    moveXY(_init_param.servo[AXIS_X].start_degree, _init_param.servo[AXIS_Y].degree, 1000);
 }

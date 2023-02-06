@@ -202,10 +202,10 @@ void setup(void)
   bluetooth_mode = system_config.getBluetoothSetting()->starting_state;
   Serial.printf("Bluetooth_mode:%s\n", bluetooth_mode ? "true" : "false");
   
-  servo.begin(system_config.getServoInfo()->servo_pin_x, START_DEGREE_VALUE_X,
-              system_config.getServoInfo()->servo_offset_x,
-              system_config.getServoInfo()->servo_pin_y, START_DEGREE_VALUE_Y,
-              system_config.getServoInfo()->servo_offset_y);
+  servo.begin(system_config.getServoInfo(AXIS_X)->pin, START_DEGREE_VALUE_X,
+              system_config.getServoInfo(AXIS_X)->offset,
+              system_config.getServoInfo(AXIS_Y)->pin, START_DEGREE_VALUE_Y,
+              system_config.getServoInfo(AXIS_Y)->offset);
   delay(2000);
 
   avatar.init(); // start drawing
