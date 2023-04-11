@@ -22,7 +22,7 @@ StackchanSERVO servo;
 M5UnitOLED oled;
 M5Canvas canvas(&oled);
 
-static constexpr char text[] = "侍ジャパン優勝おめでとう!";
+static constexpr char text[] = "横浜頂戦!";
 static constexpr size_t textlen = sizeof(text) / sizeof(text[0]);
 int textpos = 0;
 int scrollstep = 2;
