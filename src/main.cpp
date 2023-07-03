@@ -29,6 +29,9 @@ fs::FS json_fs = SD; // JSONファイルの収納場所(SPIFFS or SD)
 StackchanSystemConfig system_config;
 const char* stackchan_system_config_yaml = "/yaml/SC_Config.yaml";
 
+const unsigned long powericon_interval = 30000;  // バッテリーアイコンを更新する間隔(msec)
+unsigned long last_powericon_millis = 0;
+
 bool bluetooth_mode = false; 
 
 // --------------------
@@ -165,7 +168,7 @@ void avrc_metadata_callback(uint8_t data1, const uint8_t *data2)
 void setup(void)
 {
   auto cfg = M5.config();
-
+  cfg.output_power = false;
   cfg.external_spk = true;    /// use external speaker (SPK HAT / ATOMIC SPK)
 //cfg.external_spk_detail.omit_atomic_spk = true; // exclude ATOMIC SPK
 //cfg.external_spk_detail.omit_spk_hat    = true; // exclude SPK HAT
@@ -209,6 +212,8 @@ void setup(void)
   delay(2000);
 
   avatar.init(); // start drawing
+  avatar.setBatteryIcon(true);
+  last_powericon_millis = millis();
 
   avatar.addTask(lipSync, "lipSync");
   avatar.addTask(servoLoop, "servoLoop");
@@ -289,7 +294,7 @@ void loop(void)
     M5.Speaker.tone(2000, 100);
   }
   if (M5.getBoard() == m5::board_t::board_M5StackCore2) {
-    if (M5.Power.Axp192.getACINVolatge() < 3.0f) {
+    if (M5.Power.Axp192.getACINVoltage() < 3.0f) {
       // USBからの給電が停止したとき
       // Serial.println("USBPowerUnPlugged.");
       M5.Power.setLed(0);
@@ -306,6 +311,10 @@ void loop(void)
         last_discharge_time = 0;
       }
     }
+  }
+  if ((last_powericon_millis - millis())> powericon_interval) {
+    avatar.setBatteryStatus(M5.Power.isCharging(), M5.Power.getBatteryLevel());
+    last_powericon_millis = millis();
   }
 }
 
