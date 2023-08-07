@@ -13,6 +13,7 @@
 #include "Stackchan_servo.h"
 #include "BluetoothA2DPSink_M5Speaker.hpp"
 #include "Avatar.h"
+#include "Stackchan_Takao_Base.hpp"
 
 using namespace m5avatar;
 Avatar avatar;
@@ -87,7 +88,7 @@ fs::FS json_fs = SD; // JSONファイルの収納場所(SPIFFS or SD)
 StackchanSystemConfig system_config;
 const char* stackchan_system_config_yaml = "/yaml/SC_Config.yaml";
 
-const unsigned long powericon_interval = 30000;  // バッテリーアイコンを更新する間隔(msec)
+const unsigned long powericon_interval = 3000;  // バッテリーアイコンを更新する間隔(msec)
 unsigned long last_powericon_millis = 0;
 
 bool bluetooth_mode = false; 
@@ -250,10 +251,12 @@ void avatarStop() {
   avatar.stop();  
 }
 
+
+
 void setup(void)
 {
   auto cfg = M5.config();
-  cfg.output_power = true;
+//  cfg.output_power = true;
 //cfg.external_spk = true;    /// use external speaker (SPK HAT / ATOMIC SPK)
 //cfg.external_spk_detail.omit_atomic_spk = true; // exclude ATOMIC SPK
 //cfg.external_spk_detail.omit_spk_hat    = true; // exclude SPK HAT
@@ -283,7 +286,7 @@ void setup(void)
   
   delay(1000);
   system_config.loadConfig(json_fs, stackchan_system_config_yaml);
-  
+
   M5.Speaker.setVolume(system_config.getBluetoothSetting()->start_volume);
   M5.Speaker.setChannelVolume(system_config.getBluetoothSetting()->start_volume, m5spk_virtual_channel);
 
@@ -364,6 +367,7 @@ void loop(void)
   if (M5.BtnB.wasPressed()) {
     uint8_t volume = M5.Speaker.getChannelVolume(m5spk_virtual_channel);
     volume = volume - 10;
+    M5.Speaker.setVolume(volume);
     M5.Speaker.setChannelVolume(m5spk_virtual_channel, volume);
     M5.Speaker.tone(2000, 100);
     delay(200);
@@ -372,33 +376,45 @@ void loop(void)
   if (M5.BtnC.wasPressed()) {
     uint8_t volume = M5.Speaker.getChannelVolume(m5spk_virtual_channel);
     volume = volume + 10;
+    M5.Speaker.setVolume(volume);
     M5.Speaker.setChannelVolume(m5spk_virtual_channel, volume);
     M5.Speaker.tone(1000, 100);
     delay(200);
     M5.Speaker.tone(2000, 100);
   }
+  if ((millis() - last_powericon_millis)> powericon_interval) {
 #ifndef ARDUINO_M5Stack_Core_ESP32
   if (M5.getBoard() == m5::board_t::board_M5StackCore2) {
-    if (M5.Power.Axp192.getACINVoltage() < 3.0f) {
-      // USBからの給電が停止したとき
-      // Serial.println("USBPowerUnPlugged.");
-      M5.Power.setLed(0);
-      if ((system_config.getAutoPowerOffTime() > 0) and (last_discharge_time == 0)) {
-        last_discharge_time = millis();
-      } else if ((system_config.getAutoPowerOffTime() > 0) 
-                and ((millis() - last_discharge_time) > system_config.getAutoPowerOffTime())) {
-        M5.Power.powerOff();
-      }
-    } else {
-      //Serial.println("USBPowerPlugged.");
-      M5.Power.setLed(80);
-      if (last_discharge_time > 0) {
-        last_discharge_time = 0;
-      }
-    }
+     switch(checkTakaoBasePowerStatus(&M5.Power, &servo)) {
+      case 0: // 横から給電
+        avatar.setSpeechText("横から");
+        if (last_discharge_time > 0) {
+          last_discharge_time = 0;
+        }
+        break;
+      case 1: // 後ろから給電  
+        avatar.setSpeechText("後ろから");
+        if (last_discharge_time > 0) {
+          last_discharge_time = 0;
+        }
+        break;
+      case 2: // バッテリー
+        Serial.println("USBPowerUnPlugged.");
+        avatar.setSpeechText("バッテリー");
+
+        if ((system_config.getAutoPowerOffTime() > 0) and (last_discharge_time == 0)) {
+          last_discharge_time = millis();
+        } else if ((system_config.getAutoPowerOffTime() > 0) 
+                  and ((millis() - last_discharge_time) > system_config.getAutoPowerOffTime())) {
+          M5.Power.powerOff();
+        }
+        break;
+      default:
+        avatar.setSpeechText("UnknownStatus");
+        break;
+     }
   }
 #endif
-  if ((millis() - last_powericon_millis)> powericon_interval) {
     avatar.setBatteryStatus(M5.Power.isCharging(), M5.Power.getBatteryLevel());
     last_powericon_millis = millis();
   }

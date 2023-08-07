@@ -37,3 +37,5 @@ balloon:
   - "我是Stack-chan"
   - "I'm Stack-chan"
   - "Je suis Stack-chan"
+led_lr: 0 # 0:stereo, 1:left_only, 2:right_only
+takao_base: false # Whether to use takaobase to feed power from the rear connector.(Stack-chan_Takao_Base  https://ssci.to/8905)

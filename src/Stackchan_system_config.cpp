@@ -53,6 +53,7 @@ void StackchanSystemConfig::setDefaultParameters() {
     _lyrics[3] = "Bonjour";
     _lyrics_num = 4;
     _led_lr = 0;
+    _takao_base = false;
 }
 
 void StackchanSystemConfig::loadConfig(fs::FS& fs, const char *yaml_filename) {
@@ -112,6 +113,8 @@ void StackchanSystemConfig::setSystemConfig(DynamicJsonDocument doc) {
     for (int j=0;j<_lyrics_num;j++) {
         _lyrics[j] = balloon_lyrics[j].as<String>();
     }
+    _led_lr = doc["led_lr"];
+    _takao_base = doc["takao_base"];
 
 }
 
@@ -147,4 +150,6 @@ void StackchanSystemConfig::printAllParameters() {
     for (int i=0;i<_lyrics_num;i++) {
         Serial.printf("lyrics:%d:%s\n", i, _lyrics[i].c_str());
     }
+    Serial.printf("led_lr:%d\n", _led_lr);
+    Serial.printf("use takao_base:%s\n", _takao_base ? "true":"false");
 }

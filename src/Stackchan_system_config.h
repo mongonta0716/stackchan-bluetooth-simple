@@ -45,6 +45,7 @@ class StackchanSystemConfig {
         String _lyrics[10];                                  // 吹き出しに表示するセリフ
         uint8_t _lyrics_num;                                 // 吹き出しに表示するセリフの数
         uint8_t _led_lr;                                     // LEDを光らせる音源を指定（0:stereo, 1:left_only, 2:right_only)
+        bool _takao_base;                                    // Takao_Baseを使い後ろから給電する場合にtrue
 
         void setDefaultParameters();
         void setSystemConfig(DynamicJsonDocument doc);
@@ -64,6 +65,7 @@ class StackchanSystemConfig {
         uint32_t getAutoPowerOffTime() { return _auto_power_off_time; }
         const lgfx::IFont* getFont();
         uint8_t getLedLR() { return _led_lr; }
+        bool getUseTakaoBase() { return _takao_base; }
 };
 
 #endif // __STACKCHAN_SYSTEM_CONFIG_H__
