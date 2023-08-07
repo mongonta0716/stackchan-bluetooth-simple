@@ -387,20 +387,20 @@ void loop(void)
   if (M5.getBoard() == m5::board_t::board_M5StackCore2) {
      switch(checkTakaoBasePowerStatus(&M5.Power, &servo)) {
       case 0: // 横から給電
-        avatar.setSpeechText("横から");
+        //avatar.setSpeechText("横から");
         if (last_discharge_time > 0) {
           last_discharge_time = 0;
         }
         break;
       case 1: // 後ろから給電  
-        avatar.setSpeechText("後ろから");
+        //avatar.setSpeechText("後ろから");
         if (last_discharge_time > 0) {
           last_discharge_time = 0;
         }
         break;
       case 2: // バッテリー
         Serial.println("USBPowerUnPlugged.");
-        avatar.setSpeechText("バッテリー");
+        //avatar.setSpeechText("バッテリー");
 
         if ((system_config.getAutoPowerOffTime() > 0) and (last_discharge_time == 0)) {
           last_discharge_time = millis();
@@ -410,7 +410,7 @@ void loop(void)
         }
         break;
       default:
-        avatar.setSpeechText("UnknownStatus");
+        //avatar.setSpeechText("UnknownStatus");
         break;
      }
   }
