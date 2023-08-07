@@ -52,6 +52,7 @@ void StackchanSystemConfig::setDefaultParameters() {
     _lyrics[2] = "你好";
     _lyrics[3] = "Bonjour";
     _lyrics_num = 4;
+    _led_lr = 0;
 }
 
 void StackchanSystemConfig::loadConfig(fs::FS& fs, const char *yaml_filename) {
