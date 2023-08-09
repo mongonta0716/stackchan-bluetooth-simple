@@ -18,8 +18,8 @@ uint8_t checkTakaoBasePowerStatus(m5::Power_Class* power, StackchanSERVO* servo 
     power->setLed(80);
     return PowerStatus::SidePower;  
   }
-  while (servo->isMoving()) {delay(1);} // サーボが動いている間は待機（そうしないとサーボの動きが。）
-  power->setExtOutput(false);
+  while (servo->isMoving()) {delay(1);} // サーボが動いている間は待機（そうしないとサーボの動きが乱れる。）
+  power->setExtOutput(false); // 後側のUSB-Cの状態を把握するためにfalseにする必要があります。
   delay(500);
   if (power->Axp192.getBatteryDischargeCurrent() > 3.0f) {
     power->setExtOutput(true);

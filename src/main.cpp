@@ -21,14 +21,13 @@ StackchanSERVO servo;
 
 #include "Stackchan_system_config.h"
 
-#include <FastLED.h>
 // M5GoBottomのLEDを使わない場合は下記の1行をコメントアウトしてください。
-#define USE_LED
+//#define USE_LED
 
 #ifdef USE_LED
   #include <FastLED.h>
   #define NUM_LEDS 10
-#ifdef ARDUINO_M5STACK_FIRE
+#if defined(ARDUINO_M5STACK_FIRE) || defined(ARDUINO_M5Stack_Core_ESP32)
   #define LED_PIN 15
 #else
   #define LED_PIN 25
@@ -256,25 +255,24 @@ void avatarStop() {
 void setup(void)
 {
   auto cfg = M5.config();
-//  cfg.output_power = true;
+#ifndef ARDUINO_M5STACK_Core2
+  cfg.output_power = true;
+#endif
 //cfg.external_spk = true;    /// use external speaker (SPK HAT / ATOMIC SPK)
 //cfg.external_spk_detail.omit_atomic_spk = true; // exclude ATOMIC SPK
 //cfg.external_spk_detail.omit_spk_hat    = true; // exclude SPK HAT
 
   M5.begin(cfg);
-  if (M5.getBoard() == m5::board_t::board_M5Stack) {
-    M5.In_I2C.release();
-  }
 
   { /// custom setting
     auto spk_cfg = M5.Speaker.config();
     /// Increasing the sample_rate will improve the sound quality instead of increasing the CPU load.
-    spk_cfg.sample_rate = 96000; // default:64000 (64kHz)  e.g. 48000 , 50000 , 80000 , 96000 , 100000 , 128000 , 144000 , 192000 , 200000
+    spk_cfg.sample_rate = 64000; // default:64000 (64kHz)  e.g. 48000 , 50000 , 80000 , 96000 , 100000 , 128000 , 144000 , 192000 , 200000
     spk_cfg.task_pinned_core = APP_CPU_NUM;
     // spk_cfg.task_priority = configMAX_PRIORITIES - 2;
     spk_cfg.dma_buf_count = 20;
     //spk_cfg.stereo = true;
-    // spk_cfg.dma_buf_len = 512;
+    spk_cfg.dma_buf_len = 256;
     M5.Speaker.config(spk_cfg);
   }
 
@@ -290,8 +288,28 @@ void setup(void)
   M5.Speaker.setVolume(system_config.getBluetoothSetting()->start_volume);
   M5.Speaker.setChannelVolume(system_config.getBluetoothSetting()->start_volume, m5spk_virtual_channel);
 
+#if !defined(ARDUINO_M5Stack_Core_ESP32) && !defined(ARDUINO_M5STACK_FIRE)
+  checkTakaoBasePowerStatus(&M5.Power, &servo);
+#else
+  if (system_config.getUseTakaoBase()) {
+    M5.Power.setExtOutput(false);
+  }
+#endif
+
   bluetooth_mode = system_config.getBluetoothSetting()->starting_state;
   Serial.printf("Bluetooth_mode:%s\n", bluetooth_mode ? "true" : "false");
+
+  if ((system_config.getServoInfo(AXIS_X)->pin == 21)
+     || (system_config.getServoInfo(AXIS_X)->pin == 22)) {
+    // Port.Aを利用する場合は、I2Cが使えないのでアイコンは表示しない。
+    avatar.setBatteryIcon(false);
+    if (M5.getBoard() == m5::board_t::board_M5Stack) {
+      M5.In_I2C.release();
+    }
+  } else {
+    avatar.setBatteryIcon(true);
+    avatar.setBatteryStatus(M5.Power.isCharging(), M5.Power.getBatteryLevel());
+  }
   
   servo.begin(system_config.getServoInfo(AXIS_X)->pin, START_DEGREE_VALUE_X,
               system_config.getServoInfo(AXIS_X)->offset,
@@ -300,8 +318,6 @@ void setup(void)
   delay(2000);
 
   avatar.init(1); // start drawing
-  avatar.setBatteryIcon(true);
-  avatar.setBatteryStatus(M5.Power.isCharging(), M5.Power.getBatteryLevel());
   last_powericon_millis = millis();
 
   avatar.addTask(lipSync, "lipSync");
@@ -383,7 +399,32 @@ void loop(void)
     M5.Speaker.tone(2000, 100);
   }
   if ((millis() - last_powericon_millis)> powericon_interval) {
-#ifndef ARDUINO_M5Stack_Core_ESP32
+/*
+  Serial.printf("esp_get_free_heap_size()                              : %6d\n", esp_get_free_heap_size() );
+  Serial.printf("esp_get_minimum_free_heap_size()                      : %6d\n", esp_get_minimum_free_heap_size() );
+  //xPortGetFreeHeapSize()（データメモリ）ヒープの空きバイト数を返すFreeRTOS関数です。これはを呼び出すのと同じheap_caps_get_free_size(MALLOC_CAP_8BIT)です。
+  Serial.printf("xPortGetFreeHeapSize()                                : %6d\n", xPortGetFreeHeapSize() );
+  //xPortGetMinimumEverFreeHeapSize()また、関連heap_caps_get_minimum_free_size()するものを使用して、ブート以降のヒープの「最低水準点」を追跡できます。
+  Serial.printf("xPortGetMinimumEverFreeHeapSize()                     : %6d\n", xPortGetMinimumEverFreeHeapSize() );
+  //heap_caps_get_free_size() さまざまなメモリ機能の現在の空きメモリを返すためにも使用できます。
+  Serial.printf("heap_caps_get_free_size(MALLOC_CAP_EXEC)              : %6d\n", heap_caps_get_free_size(MALLOC_CAP_EXEC) );
+  Serial.printf("heap_caps_get_free_size(MALLOC_CAP_32BIT)             : %6d\n", heap_caps_get_free_size(MALLOC_CAP_32BIT) );
+  Serial.printf("heap_caps_get_free_size(MALLOC_CAP_8BIT)              : %6d\n", heap_caps_get_free_size(MALLOC_CAP_8BIT) );
+  Serial.printf("heap_caps_get_free_size(MALLOC_CAP_DMA)               : %6d\n", heap_caps_get_free_size(MALLOC_CAP_DMA) );
+  Serial.printf("heap_caps_get_free_size(MALLOC_CAP_PID2)              : %6d\n", heap_caps_get_free_size(MALLOC_CAP_PID2) );
+  Serial.printf("heap_caps_get_free_size(MALLOC_CAP_PID3)              : %6d\n", heap_caps_get_free_size(MALLOC_CAP_PID3) );
+  Serial.printf("heap_caps_get_free_size(MALLOC_CAP_PID3)              : %6d\n", heap_caps_get_free_size(MALLOC_CAP_PID4) );
+  Serial.printf("heap_caps_get_free_size(MALLOC_CAP_PID4)              : %6d\n", heap_caps_get_free_size(MALLOC_CAP_PID5) );
+  Serial.printf("heap_caps_get_free_size(MALLOC_CAP_PID5)              : %6d\n", heap_caps_get_free_size(MALLOC_CAP_PID6) );
+  Serial.printf("heap_caps_get_free_size(MALLOC_CAP_PID6)              : %6d\n", heap_caps_get_free_size(MALLOC_CAP_PID7) );
+  Serial.printf("heap_caps_get_free_size(MALLOC_CAP_PID7)              : %6d\n", heap_caps_get_free_size(MALLOC_CAP_PID3) );
+  Serial.printf("heap_caps_get_free_size(MALLOC_CAP_SPIRAM)            : %6d\n", heap_caps_get_free_size(MALLOC_CAP_SPIRAM) );
+  Serial.printf("heap_caps_get_free_size(MALLOC_CAP_INTERNAL)          : %6d\n", heap_caps_get_free_size(MALLOC_CAP_INTERNAL) );
+  Serial.printf("heap_caps_get_free_size(MALLOC_CAP_DEFAULT)           : %6d\n", heap_caps_get_free_size(MALLOC_CAP_DEFAULT) );
+  //Serial.printf("heap_caps_get_free_size(MALLOC_CAP_IRAM_8BIT)         : %6d\n", heap_caps_get_free_size(MALLOC_CAP_IRAM_8BIT) );
+  Serial.printf("heap_caps_get_free_size(MALLOC_CAP_INVALID)           : %6d\n", heap_caps_get_free_size(MALLOC_CAP_INVALID) );
+*/
+#if !defined(ARDUINO_M5Stack_Core_ESP32) && !defined(ARDUINO_M5STACK_FIRE)
   if (M5.getBoard() == m5::board_t::board_M5StackCore2) {
      switch(checkTakaoBasePowerStatus(&M5.Power, &servo)) {
       case 0: // 横から給電
@@ -415,9 +456,13 @@ void loop(void)
      }
   }
 #endif
-    avatar.setBatteryStatus(M5.Power.isCharging(), M5.Power.getBatteryLevel());
-    last_powericon_millis = millis();
+    if ((system_config.getServoInfo(AXIS_X)->pin != 21)
+      && (system_config.getServoInfo(AXIS_X)->pin != 22)) {
+      avatar.setBatteryStatus(M5.Power.isCharging(), M5.Power.getBatteryLevel());
+      last_powericon_millis = millis();
+    }
   }
+
 }
 
 #if !defined ( ARDUINO )

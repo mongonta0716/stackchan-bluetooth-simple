@@ -53,6 +53,7 @@ void StackchanSystemConfig::setDefaultParameters() {
     _lyrics[3] = "Bonjour";
     _lyrics_num = 4;
     _led_lr = 0;
+    _led_pin = -1;
     _takao_base = false;
 }
 
@@ -114,6 +115,7 @@ void StackchanSystemConfig::setSystemConfig(DynamicJsonDocument doc) {
         _lyrics[j] = balloon_lyrics[j].as<String>();
     }
     _led_lr = doc["led_lr"];
+    _led_pin = doc["led_pin"];
     _takao_base = doc["takao_base"];
 
 }
@@ -151,5 +153,6 @@ void StackchanSystemConfig::printAllParameters() {
         Serial.printf("lyrics:%d:%s\n", i, _lyrics[i].c_str());
     }
     Serial.printf("led_lr:%d\n", _led_lr);
+    Serial.printf("led_pin:%d\n", _led_pin);
     Serial.printf("use takao_base:%s\n", _takao_base ? "true":"false");
 }
