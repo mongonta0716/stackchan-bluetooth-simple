@@ -270,7 +270,7 @@ void setup(void)
   { /// custom setting
     auto spk_cfg = M5.Speaker.config();
     /// Increasing the sample_rate will improve the sound quality instead of increasing the CPU load.
-#ifndef ARDUINO_M5tack_Core_ESP32
+#ifndef ARDUINO_M5Stack_Core_ESP32
     // M5Stack Fire/Core2/AWS 向けPSRAM搭載機種のパラメータ
     spk_cfg.sample_rate = 96000; // default:64000 (64kHz)  e.g. 48000 , 50000 , 80000 , 96000 , 100000 , 128000 , 144000 , 192000 , 200000
     spk_cfg.task_pinned_core = APP_CPU_NUM;
