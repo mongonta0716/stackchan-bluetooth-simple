@@ -43,6 +43,7 @@ class StackchanSERVO {
         ServoEasing _servo_y;
         void attachServos();
         stackchan_servo_initial_param_s _init_param;
+        bool _isMoving;
     public:
         StackchanSERVO();
         ~StackchanSERVO();
@@ -56,6 +57,7 @@ class StackchanSERVO {
         void moveY(servo_param_s servo_param_y);
         void moveXY(servo_param_s servo_param_x, servo_param_s servo_param_y);
         void motion(Motion motion_no);
+        bool isMoving() { return _isMoving; }
 };
 
 #endif // _STACKCHAN_SERVO_H_

@@ -89,7 +89,13 @@ Please refer to [YAML file](https://github.com/mongonta0716/stackchan-bluetooth-
 - balloon<br>Set up callouts.
     - font_language("JA")<br>Specifies the language of the font." JA" or "CN", otherwise Latin font is used.
     - lyrics("おはよう","Hello","你好","Bonjour")<br>Sets lines to be displayed at random in Normal mode. Up to 10 lines.
+- led_lr<br>GoBottom1/2 will make the LED glow in response to volume. Source needs to be rewritten and compiled.
 
+    - 0: Stereo
+    - 1: Left Only
+    - 2: Right Only
+
+- takao_base<br>Enable/disable [Stack-chan_Takao_Base](https://ssci.to/8905).
 # Usage
 
 - BtnA<br>Enters Bluetooth mode. (Only valid when bluetooth_mode = false)

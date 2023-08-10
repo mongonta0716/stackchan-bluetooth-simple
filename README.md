@@ -86,7 +86,11 @@ SDカードに`/yaml/SC_Config.yaml`を配置すると自分の設定が利用�
 - balloon<br>吹き出しの設定をします。
     - font_language("JA")<br>フォントの言語を指定します。"JA"か"CN"、指定しないとラテンフォントを使用します。
     - lyrics("こんにちは",”Hello”,"你好","Bonjour")<br>ノーマルモード時にランダムで表示するセリフを設定します。最大10個まで。
-
+- led_lr<br>GoBottom1/2で音量に対応してLEDが光るようになります。※ソースの書き換えとコンパイルが必要。
+    - 0: ステレオ
+    - 1: 左の音量のみに反応
+    - 2: 右の音量のみに反応
+- takao_base<br>[Stack-chan_Takao_Base](https://ssci.to/8905)を使用するかどうかの設定。(※現在対応しているのはCore2のみ)
 # 使い方
 
 - BtnA<br>Bluetoothモードに入ります。(bluetooth_mode = falseの時のみ有効)<br>
