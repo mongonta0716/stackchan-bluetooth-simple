@@ -304,13 +304,10 @@ void setup(void)
   M5.Speaker.setVolume(system_config.getBluetoothSetting()->start_volume);
   M5.Speaker.setChannelVolume(system_config.getBluetoothSetting()->start_volume, m5spk_virtual_channel);
 
-#if !defined(ARDUINO_M5Stack_Core_ESP32) && !defined(ARDUINO_M5STACK_FIRE)
-  checkTakaoBasePowerStatus(&M5.Power, &servo);
-#else
   if (system_config.getUseTakaoBase()) {
+    checkTakaoBasePowerStatus(&M5.Power, &servo);
     M5.Power.setExtOutput(false);
   }
-#endif
 
   bluetooth_mode = system_config.getBluetoothSetting()->starting_state;
   Serial.printf("Bluetooth_mode:%s\n", bluetooth_mode ? "true" : "false");
@@ -338,7 +335,9 @@ void setup(void)
 
   // Avatarの色を変えたい場合は下記の2行のカラーコードを書き換えてください。
   cps->set(COLOR_PRIMARY, TFT_WHITE);         // 16進数で指定する場合は下記のように記述
+  //cps->set(COLOR_PRIMARY, (uint16_t)0x000000);         // 16進数で指定する場合は下記のように記述
   cps->set(COLOR_BACKGROUND, TFT_BLACK);      // (uint16_t)0xaabbcc
+  //cps->set(COLOR_BACKGROUND, (uint16_t)0xdab300);
   avatar.setColorPalette(*cps);
   last_powericon_millis = millis();
 
@@ -449,34 +448,71 @@ void loop(void)
   Serial.printf("free_block DMA: %6d\n", heap_caps_get_largest_free_block(MALLOC_CAP_DMA));
 #if !defined(ARDUINO_M5Stack_Core_ESP32) && !defined(ARDUINO_M5STACK_FIRE)
   if (M5.getBoard() == m5::board_t::board_M5StackCore2) {
-     switch(checkTakaoBasePowerStatus(&M5.Power, &servo)) {
-      case 0: // 横から給電
-        //avatar.setSpeechText("横から");
-        if (last_discharge_time > 0) {
-          last_discharge_time = 0;
-        }
-        break;
-      case 1: // 後ろから給電  
-        //avatar.setSpeechText("後ろから");
-        if (last_discharge_time > 0) {
-          last_discharge_time = 0;
-        }
-        break;
-      case 2: // バッテリー
-        Serial.println("USBPowerUnPlugged.");
-        //avatar.setSpeechText("バッテリー");
+    if (system_config.getUseTakaoBase()) {
+      switch(checkTakaoBasePowerStatus(&M5.Power, &servo)) {
+        case 0: // 横から給電
+          //avatar.setSpeechText("横から");
+          if (last_discharge_time > 0) {
+            last_discharge_time = 0;
+          }
+          break;
+        case 1: // 後ろから給電  
+          //avatar.setSpeechText("後ろから");
+          if (last_discharge_time > 0) {
+            last_discharge_time = 0;
+          }
+          break;
+        case 2: // バッテリー
+          //Serial.println("USBPowerUnPlugged.");
+          //avatar.setSpeechText("バッテリー");
 
+          if ((system_config.getAutoPowerOffTime() > 0) and (last_discharge_time == 0)) {
+            last_discharge_time = millis();
+            M5.Speaker.tone(2000, 100);
+          } else if ((system_config.getAutoPowerOffTime() > 0) 
+                    and ((millis() - last_discharge_time) > system_config.getAutoPowerOffTime())) {
+            M5.Power.setExtOutput(false);
+            M5.Speaker.tone(2000, 100);
+            delay(200);
+            M5.Speaker.tone(1000, 100);
+            delay(200);
+            M5.Speaker.tone(500, 100);
+            delay(1000);
+            M5.Power.Axp192.powerOff();
+          }
+          break;
+        default:
+          //avatar.setSpeechText("UnknownStatus");
+          break;
+      }
+    } else {
+      // Stack-chan_Takao_Baseを使わない場合
+      if (M5.Power.Axp192.getACINVoltage() < 3.0f) {
+        // USBからの給電が停止したとき
+        // Serial.println("USBPowerUnPlugged.");
+        M5.Power.setLed(0);
         if ((system_config.getAutoPowerOffTime() > 0) and (last_discharge_time == 0)) {
+          M5.Speaker.tone(500, 100);
           last_discharge_time = millis();
         } else if ((system_config.getAutoPowerOffTime() > 0) 
                   and ((millis() - last_discharge_time) > system_config.getAutoPowerOffTime())) {
-          M5.Power.powerOff();
+          M5.Power.setExtOutput(false);
+          M5.Speaker.tone(2000, 100);
+          delay(200);
+          M5.Speaker.tone(1000, 100);
+          delay(200);
+          M5.Speaker.tone(500, 100);
+          delay(1000);
+          M5.Power.Axp192.powerOff();
         }
-        break;
-      default:
-        //avatar.setSpeechText("UnknownStatus");
-        break;
-     }
+      } else {
+        //Serial.println("USBPowerPlugged.");
+        M5.Power.setLed(80);
+        if (last_discharge_time > 0) {
+          last_discharge_time = 0;
+        }
+      }
+    }
   }
 #endif
     if ((system_config.getServoInfo(AXIS_X)->pin != 21)
