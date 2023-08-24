@@ -478,7 +478,7 @@ void loop(void)
             delay(200);
             M5.Speaker.tone(500, 100);
             delay(1000);
-            M5.Power.Axp192.powerOff();
+            M5.Power.powerOff();
           }
           break;
         default:
@@ -503,7 +503,7 @@ void loop(void)
           delay(200);
           M5.Speaker.tone(500, 100);
           delay(1000);
-          M5.Power.Axp192.powerOff();
+          M5.Power.powerOff();
         }
       } else {
         //Serial.println("USBPowerPlugged.");
