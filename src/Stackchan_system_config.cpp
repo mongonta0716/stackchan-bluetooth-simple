@@ -28,9 +28,11 @@ void StackchanSystemConfig::setDefaultParameters() {
     _servo[AXIS_X].offset = 0;
     _servo[AXIS_X].lower_limit = 0;
     _servo[AXIS_X].upper_limit = 180;
+    _servo[AXIS_X].start_degree = 90;
     _servo[AXIS_Y].offset = 0;
     _servo[AXIS_Y].lower_limit = 50;
     _servo[AXIS_Y].upper_limit = 90;
+    _servo[AXIS_Y].start_degree = 90;
     _servo_interval[0].mode_name = "normal";
     _servo_interval[0].interval_min = 5000;
     _servo_interval[0].interval_max = 10000;
@@ -55,6 +57,7 @@ void StackchanSystemConfig::setDefaultParameters() {
     _led_lr = 0;
     _led_pin = -1;
     _takao_base = false;
+    _servo_type = 0;
 }
 
 void StackchanSystemConfig::loadConfig(fs::FS& fs, const char *yaml_filename) {
@@ -117,6 +120,17 @@ void StackchanSystemConfig::setSystemConfig(DynamicJsonDocument doc) {
     _led_lr = doc["led_lr"];
     _led_pin = doc["led_pin"];
     _takao_base = doc["takao_base"];
+    _servo_type_str = doc["servo_type"].as<String>();
+    if (_servo_type_str.indexOf("SCS") != -1) {
+        // SCS0009
+        _servo_type = 1;
+        _servo[AXIS_X].start_degree = 150;
+        _servo[AXIS_Y].start_degree = 150;
+    } else {
+        _servo_type = 0; // PWMサーボ
+        _servo[AXIS_X].start_degree = 90;
+        _servo[AXIS_Y].start_degree = 90;
+    }
 
 }
 
@@ -155,4 +169,6 @@ void StackchanSystemConfig::printAllParameters() {
     Serial.printf("led_lr:%d\n", _led_lr);
     Serial.printf("led_pin:%d\n", _led_pin);
     Serial.printf("use takao_base:%s\n", _takao_base ? "true":"false");
+    Serial.printf("ServoTypeStr:%s\n", _servo_type_str.c_str());
+    Serial.printf("ServoType: %d\n", _servo_type);
 }

@@ -7,6 +7,7 @@
 // その対処でStackchan_servo.hはh, Stackchan_servo.cppはhppをincludeしています。
 #define SUPPRESS_HPP_WARNING
 #include <ServoEasing.h>
+#include <SCServo.h>
 
 enum Motion {
     nomove,    // 動かない
@@ -22,14 +23,19 @@ enum ServoAxis {
     AXIS_Y
 };
 
+enum ServoType {
+    PWM,
+    SCS
+};
+
 typedef struct ServoParam {
     int pin;                    // サーボのピン番号
-    int8_t start_degree;              // 初期角度
-    int8_t offset;                    // オフセット（90°からの+-）
-    int8_t degree;                    // 角度
+    int16_t start_degree;              // 初期角度
+    int16_t offset;                    // オフセット（90°からの+-）
+    int16_t degree;                    // 角度
     uint32_t millis_for_move;         // 移動時間(msec)
-    uint8_t lower_limit;              // サーボ角度の下限
-    uint8_t upper_limit;              // サーボ角度の上限
+    uint16_t lower_limit;              // サーボ角度の下限
+    uint16_t upper_limit;              // サーボ角度の上限
 } servo_param_s;
 
 
@@ -39,6 +45,8 @@ typedef struct  StackchanServo{
 
 class StackchanSERVO {
     protected:
+        ServoType _servo_type;
+        SCSCL _sc;
         ServoEasing _servo_x;
         ServoEasing _servo_y;
         void attachServos();
@@ -48,8 +56,9 @@ class StackchanSERVO {
         StackchanSERVO();
         ~StackchanSERVO();
         void begin(stackchan_servo_initial_param_s init_params);
-        void begin(int servo_pin_x, int8_t start_degree_x, int8_t offset_x, 
-                   int servo_pin_y, int8_t start_degree_y, int8_t offset_y);
+        void begin(int servo_pin_x, int16_t start_degree_x, int16_t offset_x, 
+                   int servo_pin_y, int16_t start_degree_y, int16_t offset_y,
+                   ServoType servo_type=PWM);
         void moveX(int x, uint32_t millis_for_move = 0);
         void moveY(int y, uint32_t millis_for_move = 0);
         void moveXY(int x, int y, uint32_t millis_for_move);

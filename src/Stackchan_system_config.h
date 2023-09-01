@@ -24,9 +24,10 @@ typedef struct Bluetooth {
 
 typedef struct ServoInitialParam {
         uint8_t pin;
-        uint8_t offset;
-        uint8_t upper_limit;
-        uint8_t lower_limit;
+        uint16_t offset;
+        uint16_t upper_limit;
+        uint16_t lower_limit;
+        uint16_t start_degree;
 } servo_initial_param_s;
 
 enum AvatarMode {
@@ -47,6 +48,8 @@ class StackchanSystemConfig {
         uint8_t _led_lr;                                     // LEDを光らせる音源を指定（0:stereo, 1:left_only, 2:right_only)
         int _led_pin;
         bool _takao_base;                                    // Takao_Baseを使い後ろから給電する場合にtrue
+        String _servo_type_str;
+        uint8_t _servo_type;                                 // サーボの種類 (0: PWMサーボ, 1: Feetech SCS0009)
 
         void setDefaultParameters();
         void setSystemConfig(DynamicJsonDocument doc);
@@ -68,6 +71,7 @@ class StackchanSystemConfig {
         uint8_t getLedLR() { return _led_lr; }
         int getLedPin() { return _led_pin; }
         bool getUseTakaoBase() { return _takao_base; }
+        uint8_t getServoType() { return _servo_type; }
 };
 
 #endif // __STACKCHAN_SYSTEM_CONFIG_H__

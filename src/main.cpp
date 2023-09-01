@@ -80,10 +80,6 @@ StackchanSERVO servo;
 #endif
 
 
-// --------------------
-// サーボ関連の初期設定
-#define START_DEGREE_VALUE_X 90         // Xサーボの初期位置（変更しないでください。） Start angle of ServoX
-#define START_DEGREE_VALUE_Y 90         // Yサーボの初期位置（変更しないでください。） Start angle of ServoY
 
 fs::FS json_fs = SD; // JSONファイルの収納場所(SPIFFS or SD)
 StackchanSystemConfig system_config;
@@ -147,12 +143,12 @@ void servoLoop(void *args) {
 //    Serial.printf("x:%f:y:%f\n", gaze_x, gaze_y);
     // X軸は90°から+-で左右にスイング
     if (gaze_x < 0) {
-      move_x = START_DEGREE_VALUE_X - mouth_ratio * 15 + (int)(30.0 * gaze_x);
+      move_x = system_config.getServoInfo(AXIS_X)->start_degree - mouth_ratio * 15 + (int)(30.0 * gaze_x);
     } else {
-      move_x = START_DEGREE_VALUE_X + mouth_ratio * 15 + (int)(30.0 * gaze_x);
+      move_x = system_config.getServoInfo(AXIS_X)->start_degree + mouth_ratio * 15 + (int)(30.0 * gaze_x);
     }
     // Y軸は90°から上にスイング（最大35°）
-    move_y = START_DEGREE_VALUE_Y - mouth_ratio * 10 - abs(25.0 * gaze_y);
+    move_y = system_config.getServoInfo(AXIS_Y)->start_degree - mouth_ratio * 10 - abs(25.0 * gaze_y);
     servo.moveXY(move_x, move_y, move_time);
     if (!bluetooth_mode) {
       int lyric_no = random(system_config.getLyrics_num());
@@ -324,10 +320,11 @@ void setup(void)
     avatar.setBatteryStatus(M5.Power.isCharging(), M5.Power.getBatteryLevel());
   }
   
-  servo.begin(system_config.getServoInfo(AXIS_X)->pin, START_DEGREE_VALUE_X,
+  servo.begin(system_config.getServoInfo(AXIS_X)->pin, system_config.getServoInfo(AXIS_X)->start_degree,
               system_config.getServoInfo(AXIS_X)->offset,
-              system_config.getServoInfo(AXIS_Y)->pin, START_DEGREE_VALUE_Y,
-              system_config.getServoInfo(AXIS_Y)->offset);
+              system_config.getServoInfo(AXIS_Y)->pin, system_config.getServoInfo(AXIS_Y)->start_degree,
+              system_config.getServoInfo(AXIS_Y)->offset,
+              (ServoType)system_config.getServoType());
   delay(2000);
 
   avatar.init(1); // start drawing
@@ -342,7 +339,7 @@ void setup(void)
   last_powericon_millis = millis();
 
   avatar.addTask(lipSync, "lipSync");
-  avatar.addTask(servoLoop, "servoLoop");
+  avatar.addTask(servoLoop, "servoLoop", 2048U, 1);
   avatar.setExpression(Expression::Neutral);
   avatar.setSpeechFont(system_config.getFont());
 
