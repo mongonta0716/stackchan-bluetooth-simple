@@ -45,8 +45,8 @@ void StackchanSystemConfig::setDefaultParameters() {
     _servo_interval[1].move_max = 1500;
     _mode_num = 2;
     _bluetooth.device_name = "M5Stack_BTSPK";
-    _bluetooth.starting_state = false;
-    _bluetooth.start_volume = 100;
+    _bluetooth.starting_state = true;
+    _bluetooth.start_volume = 150;
     _auto_power_off_time = 0;
     _font_language_code = "JA";
     _lyrics[0] = "こんにちは";
@@ -58,6 +58,8 @@ void StackchanSystemConfig::setDefaultParameters() {
     _led_pin = -1;
     _takao_base = false;
     _servo_type = 0;
+    _servo[AXIS_X].start_degree = 90;
+    _servo[AXIS_Y].start_degree = 90;
 }
 
 void StackchanSystemConfig::loadConfig(fs::FS& fs, const char *yaml_filename) {
