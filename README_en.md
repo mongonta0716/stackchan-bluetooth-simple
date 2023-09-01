@@ -62,8 +62,8 @@ Please refer to [YAML file](https://github.com/mongonta0716/stackchan-bluetooth-
 
 - servo
     - pin
-        - x(Core1 22, Core2 33)<br> GPIO No of Servo X
-        - y(Core1 21, Core2 32)<br> GPIO No of Servo Y
+        - x(Core1 22, Core2 33)<br> GPIO No of Servo X(Serial Servo:RX pin)
+        - y(Core1 21, Core2 32)<br> GPIO No of Servo Y(Serial Servo:TX pin)
     - offset<br>
         - x(0)<br> Offset x
         - y(0)<br> Offset y
@@ -81,8 +81,8 @@ Please refer to [YAML file](https://github.com/mongonta0716/stackchan-bluetooth-
              - move_max(1500)
 - bluetooth
     - device_name(M5Stack_BTSPK)<br>Specify the device name of the Bluetooth speaker.
-    - starting_state("false")<br>Specify whether Bluetooth mode is enabled or disabled at startup.
-    - start_volume(100)<br>Initial volume of Bluetooth speaker.
+    - starting_state(true)<br>Specify whether Bluetooth mode is enabled or disabled at startup.
+    - start_volume(150)<br>Initial volume of Bluetooth speaker.
 
 - auto_power_off_time(0)<br>Core2 only. power off after USB power supply is turned off and after a set time elapses. (0 does not power off)
 
@@ -96,6 +96,11 @@ Please refer to [YAML file](https://github.com/mongonta0716/stackchan-bluetooth-
     - 2: Right Only
 
 - takao_base<br>Enable/disable [Stack-chan_Takao_Base](https://ssci.to/8905).
+
+- servo_type<br>Specify servo type
+    - "PWM": SG90 PWM Servo
+    - "SCS": Feetech SCS0009
+
 # Usage
 
 - BtnA<br>Enters Bluetooth mode. (Only valid when bluetooth_mode = false)
