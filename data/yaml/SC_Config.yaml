@@ -4,6 +4,7 @@ servo:
     # Core1 PortA X:22,Y:21 PortC X:16,Y:17
     # Core2 PortA X:33,Y:32 PortC X:13,Y:14
     # Stack-chanPCB Core1 X:5,Y:2 Core2 X:19,Y27
+    # When using SCS0009, x:RX, y:TX (not used).(StackchanRT Version:Core1 x16,y17, Core2: x13,y14)
     x: 22
     y: 21
   offset: 
@@ -40,4 +41,4 @@ balloon:
 led_lr: 0 # 0:stereo, 1:left_only, 2:right_only
 led_pin: 15 # GoBottom1:15 GoBottom2:25
 takao_base: false # Whether to use takaobase to feed power from the rear connector.(Stack-chan_Takao_Base  https://ssci.to/8905)
-servp_type: "PWM" # "PWM": SG90PWMServo, "SCS": Feetech SCS0009
+servo_type: "PWM" # "PWM": SG90PWMServo, "SCS": Feetech SCS0009

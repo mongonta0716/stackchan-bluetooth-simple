@@ -59,8 +59,8 @@ SDカードに`/yaml/SC_Config.yaml`を配置すると自分の設定が利用�
 (カッコ内)は初期値
 - servo
     - pin
-        - x(Core1 22, Core2 33)<br> X軸のGPIOを指定
-        - y(Core1 21, Core2 32)<br> Y軸のGPIOを指定
+        - x(Core1 22, Core2 33)<br> X軸のGPIOを指定(シリアルサーボの場合はRX)
+        - y(Core1 21, Core2 32)<br> Y軸のGPIOを指定(シリアルサーボの場合はTX)
     - offset<br>サーボの軸が90°にしたときにズレを修正するパラメータ
         - x(0)<br> X軸のオフセット値を設定
         - y(0)<br> Y軸のオフセット値を設定
@@ -91,6 +91,9 @@ SDカードに`/yaml/SC_Config.yaml`を配置すると自分の設定が利用�
     - 1: 左の音量のみに反応
     - 2: 右の音量のみに反応
 - takao_base<br>[Stack-chan_Takao_Base](https://ssci.to/8905)を使用するかどうかの設定。(※現在対応しているのはCore2のみ)
+- servo_type<br>サーボの種類を指定
+    - "PWM": SG90系のPWMサーボ
+    - "SCS": Feetech SCS0009 シリアルサーボ
 # 使い方
 
 - BtnA<br>Bluetoothモードに入ります。(bluetooth_mode = falseの時のみ有効)<br>
