@@ -24,7 +24,7 @@ typedef struct Bluetooth {
 
 typedef struct ServoInitialParam {
         uint8_t pin;
-        uint16_t offset;
+        int16_t offset;
         uint16_t upper_limit;
         uint16_t lower_limit;
         uint16_t start_degree;
