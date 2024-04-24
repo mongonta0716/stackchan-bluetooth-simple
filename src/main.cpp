@@ -9,6 +9,7 @@
 #include <M5Unified.h>
 #include <WiFi.h>
 #include <WiFiUdp.h>
+#include <esp_now.h>
 #include <esp_wifi.h>
 #include "Stackchan_servo.h"
 #include "BluetoothA2DPSink_M5Speaker.hpp"
@@ -27,14 +28,22 @@ StackchanSERVO servo;
 #ifdef USE_LED
   #include <FastLED.h>
   #define NUM_LEDS 10
+  #define NUM_LEDS_HEX 37
 #if defined(ARDUINO_M5STACK_FIRE) || defined(ARDUINO_M5Stack_Core_ESP32)
   // M5Core1 + M5GoBottom1の組み合わせ
   #define LED_PIN 15
+  #define LED_PIN_HEX 26
+  CLEDController *controllers[2];
+  uint8_t gHue = 0;
 #else
   // M5Core2 + M5GoBottom2の組み合わせ
   #define LED_PIN 25
+  #define LED_PIN_HEX 26
+  CLEDController *controllers[2];
+  uint8_t gHue = 0;
 #endif
   CRGB leds[NUM_LEDS];
+  CRGB leds_hex[NUM_LEDS_HEX];
   #ifdef USE_LED_OUT
   CRGB leds_out[NUM_LED_OUT];
   #endif
@@ -46,11 +55,12 @@ StackchanSERVO servo;
   CHSV yellow (45, 255, 255);
   CHSV hsv_table[5] = { blue, green, yellow, magenta, red };
   CHSV hsv_table_out[5] = { blue, green, yellow, magenta, red }; //red, magenta, yellow, green, blue };
+  uint8_t hue[5] = {0, 95, 160, 210, 45};
 
   void turn_off_led() {
     // Now turn the LED off, then pause
     for(int i=0;i<NUM_LEDS;i++) leds[i] = CRGB::Black;
-    FastLED.show();  
+    controllers[0]->showLeds(25);//FastLED.show();  
   }
 
   void clear_led_buff() {
@@ -64,21 +74,22 @@ StackchanSERVO servo;
     
     clear_led_buff(); 
     for(int i=0;i<level1;i++){
-      fill_gradient(leds, 0, hsv_table[i], 4, hsv_table[0] );
+      fill_rainbow(leds, NUM_LEDS, hue[i] );
+      //fill_gradient(leds, 0, hsv_table[i], 4, hsv_table[0] );
       #ifdef USE_LED_OUT
       fill_gradient(leds_out, 0, hsv_table_out[0], 18, hsv_table_out[i] );
       #endif
     }
     for(int i=0;i<level2;i++){
-      fill_gradient(leds, 5, hsv_table[0], 9, hsv_table[i] );
+      fill_rainbow(leds, NUM_LEDS, hue[i] );
+      //fill_gradient(leds, 5, hsv_table[0], 9, hsv_table[i] );
       #ifdef USE_LED_OUT
       fill_gradient(leds_out, 19, hsv_table_out[i], 36, hsv_table_out[0] );
       #endif
     }
-    FastLED.show();
+    controllers[0]->showLeds(25);//FastLED.show();  
   }
 #endif
-
 
 
 fs::FS json_fs = SD; // JSONファイルの収納場所(SPIFFS or SD)
@@ -89,6 +100,7 @@ const unsigned long powericon_interval = 3000;  // バッテリーアイコン�
 unsigned long last_powericon_millis = 0;
 
 bool bluetooth_mode = false; 
+uint8_t bluetooth_status = 0; // 0:wait 1:connect 2:sing
 
 // --------------------
 // Avatar関連の初期設定
@@ -109,6 +121,8 @@ static BluetoothA2DPSink_M5Speaker a2dp_sink = { &M5.Speaker, m5spk_virtual_chan
 static fft_t fft;
 static constexpr size_t WAVE_SIZE = 320;
 static int16_t raw_data[WAVE_SIZE * 2];
+
+TaskHandle_t servo_taskhandle;
 
 void servoLoop(void *args) {
   DriveContext *ctx = (DriveContext *)args;
@@ -150,7 +164,7 @@ void servoLoop(void *args) {
     // Y軸は90°から上にスイング（最大35°）
     move_y = system_config.getServoInfo(AXIS_Y)->start_degree - mouth_ratio * 10 - abs(25.0 * gaze_y);
     servo.moveXY(move_x, move_y, move_time);
-    if (!bluetooth_mode) {
+    if (bluetooth_status < 3) {
       int lyric_no = random(system_config.getLyrics_num());
       int exp2 = random(2);
       avatar->setMouthOpenRatio(1.0f);
@@ -207,6 +221,13 @@ void lipSync(void *args)
       }
       //Serial.printf("level:%d\n", level >> 16);
     }
+#ifdef USE_LED
+    fill_rainbow( leds, NUM_LEDS, gHue);
+    controllers[0]->showLeds(25);//FastLED.show();  
+    fill_rainbow( leds_hex, NUM_LEDS_HEX, gHue, 7);
+    controllers[1]->showLeds(25);
+    EVERY_N_MILLISECONDS( 20 ) { gHue = gHue + 10; }
+#endif
 
     // スレッド内でログを出そうとすると不具合が起きる場合があります。
     //Serial.printf("data=%d\n\r", level >> 16);
@@ -223,9 +244,29 @@ void lipSync(void *args)
   vTaskDelete(NULL);
 }
 
+
 void hvt_event_callback(int avatar_expression, const char* text) {
   avatar.setExpression((Expression)avatar_expression);
-  avatar.setSpeechText(text);
+  String avatar_text;
+  if (text == "BTWait") {
+    bluetooth_status = 0; // Wait Mode
+    avatar.setSpeechText("BT接続待ち");
+  } else if (text == "BTConnect") {
+    bluetooth_status = 1;
+    avatar.setSpeechText("BT接続中");
+  } else if (text == "Sing") {
+    bluetooth_status = 3;
+    avatar.setSpeechText("歌ってます");
+  } else if (text == "SingWait") {
+    bluetooth_status = 2;
+    avatar.setSpeechText("歌待機");
+  } else if (text == "AudioCfg") {
+    avatar.setSpeechText("AudioCfg");
+    bluetooth_status = 4;
+  } else {
+    avatar.setSpeechText("不明");
+    bluetooth_status = 9;
+  }
 }
 
 void avrc_metadata_callback(uint8_t data1, const uint8_t *data2)
@@ -256,6 +297,12 @@ void setup(void)
   auto cfg = M5.config();
 #ifndef ARDUINO_M5STACK_Core2
   cfg.output_power = true;
+#endif
+
+#ifdef ARDUINO_M5Stack_ATOM
+
+  cfg.external_speaker.atomic_spk = true;
+
 #endif
 //cfg.external_spk = true;    /// use external speaker (SPK HAT / ATOMIC SPK)
 //cfg.external_spk_detail.omit_atomic_spk = true; // exclude ATOMIC SPK
@@ -338,8 +385,6 @@ void setup(void)
   avatar.setColorPalette(*cps);
   last_powericon_millis = millis();
 
-  avatar.addTask(lipSync, "lipSync");
-  avatar.addTask(servoLoop, "servoLoop", 2048U, 1);
   avatar.setExpression(Expression::Neutral);
   avatar.setSpeechFont(system_config.getFont());
 
@@ -354,25 +399,45 @@ void setup(void)
   }
 
 #ifdef USE_LED
-  FastLED.addLeds<SK6812, LED_PIN, GRB>(leds, NUM_LEDS);  // GRB ordering is typical
-  FastLED.setBrightness(32);
+  controllers[0] = &FastLED.addLeds<SK6812, LED_PIN, GRB>(leds, NUM_LEDS);  // GRB ordering is typical
+  controllers[1] = &FastLED.addLeds<SK6812, LED_PIN_HEX, GRB>(leds_hex, NUM_LEDS_HEX).setCorrection(TypicalLEDStrip);  // GRB ordering is typical
+  //FastLED.setBrightness(25);
   level_led(5, 5);
   delay(1000);
   turn_off_led();
 #endif
-
-
+  avatar.addTask(lipSync, "lipSync");
+  avatar.addTask(servoLoop, "servoLoop", 2048U, 1, &servo_taskhandle);
 }
 
 void loop(void)
 {
 
   M5.update();
+
   if (M5.BtnA.wasDecideClickCount())
   {
     switch (M5.BtnA.getClickCount())
     {
     case 1:
+      vTaskSuspend(servo_taskhandle);
+      for (int i=0;i<3;i++) {
+        servo.moveX(100);
+        delay(500);
+        servo.moveX(200);
+        delay(500);
+        servo.moveX(100);
+        delay(500);
+        servo.moveX(200);
+        delay(500);
+      }
+      servo.turn(500, 1500);
+      servo.moveX(90);
+      servo.turn(1500, 1500);
+      servo.moveX(90);
+      vTaskResume(servo_taskhandle);
+      break;
+    case 2:
       if (!bluetooth_mode) {
         a2dp_sink.set_avrc_metadata_callback(avrc_metadata_callback);
         a2dp_sink.setHvtEventCallback(hvt_event_callback);
@@ -384,7 +449,7 @@ void loop(void)
       }
       break;
 
-    case 2:
+    case 3:
       if (bluetooth_mode) {
         avatar.setExpression(Expression::Neutral);
         avatar.setSpeechText("Normal Mode");
@@ -442,8 +507,8 @@ void loop(void)
   //Serial.printf("heap_caps_get_free_size(MALLOC_CAP_IRAM_8BIT)         : %6d\n", heap_caps_get_free_size(MALLOC_CAP_IRAM_8BIT) );
   Serial.printf("heap_caps_get_free_size(MALLOC_CAP_INVALID)           : %6d\n", heap_caps_get_free_size(MALLOC_CAP_INVALID) );
 */
-  Serial.printf("free_block DMA: %6d\n", heap_caps_get_largest_free_block(MALLOC_CAP_DMA));
-#if !defined(ARDUINO_M5Stack_Core_ESP32) && !defined(ARDUINO_M5STACK_FIRE)
+  //Serial.printf("free_block DMA: %6d\n", heap_caps_get_largest_free_block(MALLOC_CAP_DMA));
+#if !defined(ARDUINO_M5Stack_Core_ESP32) && !defined(ARDUINO_M5STACK_FIRE) &&!defined(ARDUINO_M5Stack_ATOM)
   if (M5.getBoard() == m5::board_t::board_M5StackCore2) {
     if (system_config.getUseTakaoBase()) {
       switch(checkTakaoBasePowerStatus(&M5.Power, &servo)) {
@@ -484,7 +549,7 @@ void loop(void)
       }
     } else {
       // Stack-chan_Takao_Baseを使わない場合
-      if (M5.Power.Axp192.getACINVoltage() < 3.0f) {
+      if ((M5.Power.Axp192.getACINVoltage()) < 3.0f && (M5.Power.Ina3221.getBusVoltage(2) < 3.0f)) {
         // USBからの給電が停止したとき
         // Serial.println("USBPowerUnPlugged.");
         M5.Power.setLed(0);
