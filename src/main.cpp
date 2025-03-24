@@ -4,16 +4,16 @@
 
 #include <Arduino.h>
 
-#include <Ticker.h>
+//#include <Ticker.h>
 #include <SD.h>
 #include <M5Unified.h>
-#include <WiFi.h>
-#include <WiFiUdp.h>
-#include <esp_wifi.h>
+//#include <WiFi.h>
+//#include <WiFiUdp.h>
+//#include <esp_wifi.h>
 #include "Stackchan_servo.h"
 #include "BluetoothA2DPSink_M5Speaker.hpp"
 #include "Avatar.h"
-#include "Stackchan_Takao_Base.hpp"
+//#include "Stackchan_Takao_Base.hpp"
 
 using namespace m5avatar;
 Avatar avatar;
