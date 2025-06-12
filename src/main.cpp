@@ -4,17 +4,16 @@
 
 #include <Arduino.h>
 
-#include <Ticker.h>
+//#include <Ticker.h>
 #include <SD.h>
 #include <M5Unified.h>
-#include <WiFi.h>
-#include <WiFiUdp.h>
-#include <esp_now.h>
-#include <esp_wifi.h>
+//#include <WiFi.h>
+//#include <WiFiUdp.h>
+//#include <esp_wifi.h>
 #include "Stackchan_servo.h"
 #include "BluetoothA2DPSink_M5Speaker.hpp"
 #include "Avatar.h"
-#include "Stackchan_Takao_Base.hpp"
+//#include "Stackchan_Takao_Base.hpp"
 
 using namespace m5avatar;
 Avatar avatar;
@@ -28,7 +27,7 @@ StackchanSERVO servo;
 #ifdef USE_LED
   #include <FastLED.h>
   #define NUM_LEDS 10
-  #define NUM_LEDS_HEX 37
+  #define NUM_LEDS_HEX 55
 #if defined(ARDUINO_M5STACK_FIRE) || defined(ARDUINO_M5Stack_Core_ESP32)
   // M5Core1 + M5GoBottom1の組み合わせ
   #define LED_PIN 15
@@ -348,8 +347,9 @@ void setup(void)
   M5.Speaker.setChannelVolume(system_config.getBluetoothSetting()->start_volume, m5spk_virtual_channel);
 
   if (system_config.getUseTakaoBase()) {
-    checkTakaoBasePowerStatus(&M5.Power, &servo);
-    M5.Power.setExtOutput(false);
+    M5.Power.setExtOutput(false);  // TakaoBaseの後ろ給電を使用する。
+  } else {
+    M5.Power.setExtOutput(true);  // M5Stackの横から給電を使用する。
   }
 
   bluetooth_mode = system_config.getBluetoothSetting()->starting_state;
@@ -431,9 +431,9 @@ void loop(void)
         servo.moveX(200);
         delay(500);
       }
-      servo.turn(500, 1500);
+      //servo.turn(500, 1500);
       servo.moveX(90);
-      servo.turn(1500, 1500);
+      //servo.turn(1500, 1500);
       servo.moveX(90);
       vTaskResume(servo_taskhandle);
       break;
@@ -510,46 +510,28 @@ void loop(void)
   //Serial.printf("free_block DMA: %6d\n", heap_caps_get_largest_free_block(MALLOC_CAP_DMA));
 #if !defined(ARDUINO_M5Stack_Core_ESP32) && !defined(ARDUINO_M5STACK_FIRE) &&!defined(ARDUINO_M5Stack_ATOM)
   if (M5.getBoard() == m5::board_t::board_M5StackCore2) {
-    if (system_config.getUseTakaoBase()) {
-      switch(checkTakaoBasePowerStatus(&M5.Power, &servo)) {
-        case 0: // 横から給電
-          //avatar.setSpeechText("横から");
-          if (last_discharge_time > 0) {
-            last_discharge_time = 0;
-          }
-          break;
-        case 1: // 後ろから給電  
-          //avatar.setSpeechText("後ろから");
-          if (last_discharge_time > 0) {
-            last_discharge_time = 0;
-          }
-          break;
-        case 2: // バッテリー
-          //Serial.println("USBPowerUnPlugged.");
-          //avatar.setSpeechText("バッテリー");
-
-          if ((system_config.getAutoPowerOffTime() > 0) and (last_discharge_time == 0)) {
-            last_discharge_time = millis();
-            M5.Speaker.tone(2000, 100);
-          } else if ((system_config.getAutoPowerOffTime() > 0) 
-                    and ((millis() - last_discharge_time) > system_config.getAutoPowerOffTime())) {
-            M5.Power.setExtOutput(false);
-            M5.Speaker.tone(2000, 100);
-            delay(200);
-            M5.Speaker.tone(1000, 100);
-            delay(200);
-            M5.Speaker.tone(500, 100);
-            delay(1000);
-            M5.Power.powerOff();
-          }
-          break;
-        default:
-          //avatar.setSpeechText("UnknownStatus");
-          break;
+    // Stack-chan_Takao_Baseを使わない場合
+    if ((M5.Power.Axp192.getACINVoltage() < 3.0f) && (M5.Power.Ina3221[0].getBusVoltage(2) < 3.0f)) {
+      // USBからの給電が停止したとき
+      // Serial.println("USBPowerUnPlugged.");
+      M5.Power.setLed(0);
+      if ((system_config.getAutoPowerOffTime() > 0) and (last_discharge_time == 0)) {
+        M5.Speaker.tone(500, 100);
+        last_discharge_time = millis();
+      } else if ((system_config.getAutoPowerOffTime() > 0) 
+                and ((millis() - last_discharge_time) > system_config.getAutoPowerOffTime())) {
+        M5.Power.setExtOutput(false);
+        M5.Speaker.tone(2000, 100);
+        delay(200);
+        M5.Speaker.tone(1000, 100);
+        delay(200);
+        M5.Speaker.tone(500, 100);
+        delay(1000);
+        M5.Power.powerOff();
       }
     } else {
       // Stack-chan_Takao_Baseを使わない場合
-      if ((M5.Power.Axp192.getACINVoltage()) < 3.0f && (M5.Power.Ina3221.getBusVoltage(2) < 3.0f)) {
+      if ((M5.Power.Axp192.getACINVoltage()) < 3.0f && (M5.Power.getVBUSVoltage()) < 3.0f) {
         // USBからの給電が停止したとき
         // Serial.println("USBPowerUnPlugged.");
         M5.Power.setLed(0);

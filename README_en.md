@@ -1,113 +1,112 @@
 # stackchan-bluetooth-simple
 
-[日本語](README.md) | English
+[Japanese](README.md) | English
 
-# Overview 
+# Overview
 
-Based on the M5Stack-Avatar, a simple Bluetooth speaker function and servo control function for the stack chan are added.
-It is modified based on Bluetooth_with_ESP32A2DP, which is an example of [M5Unified](https://github.com/m5stack/M5Unified).
+This is a simple implementation that adds Bluetooth speaker functionality and Stack-chan's servo control features based on M5Stack-Avatar.
+It is modified from the Bluetooth_with_ESP32A2DP example in [M5Unified](https://github.com/m5stack/M5Unified).
 
-
-# environment
-
+# Development Environment
 - VSCode
-
 - PlatformIO
 
-# Support Devices
+# Supported Models
 
-- M5Stack Basic/Gray/M5Go<br>Basic is only available with 16MB of Flash memory.
+- M5Stack Basic/Gray/M5Go<br>For Basic, only models with 16MB Flash memory are supported.
 
 - M5Stack Fire
 
 - M5Stack Core2 / Core2 for AWSIoT
 
-# Requirement
+# Required Libraries
+Arduino-ESP32 has been tested with version 2.0.4 (2.0.0 for Fire only). M5Stack Fire has issues with arduino-esp32v2.0.4 and won't start.
 
-Arduino-ESP32 is confirmed to work with 2.0.4 (Fire only 2.0.0). M5Stack Fire has a problem with arduino-esp32v2.0.4 and does not start.
-
-See [platformio.ini](https://github.com/mongonta0716/stackchan-bluetooth-simple/blob/main/platformio.ini) for detailed version information.
+For detailed version information, please check [platformio.ini](https://github.com/mongonta0716/stackchan-bluetooth-simple/blob/main/platformio.ini).
 
 - [M5Stack-Avatar](https://github.com/meganetaaan/m5stack-avatar)
 
-- [ServoEasing](https://github.com/ArminJo/ServoEasing)
-
-- [ESP32Servo](https://github.com/madhephaestus/ESP32Servo)
-
-- [M5Unified](https://github.com/m5stack/M5Unified)
-
 - [ESP8266Audio](https://github.com/earlephilhower/ESP8266Audio)
 
-- [ESP32-A2DP](https://github.com/pschatzmann/ESP32-A2DP)
+- [stackchan-arduino](https://github.com/mongonta0716/stackchan-arduino)
 
-- [ArduinoJson](https://github.com/bblanchon/ArduinoJson)
+# Compilation Notes
 
-- [YAMLDuino](https://github.com/tobozo/YAMLDuino)
+- M5Stack Fire V2.6/M5Stack Basic V2.6<br>When using TF card, we found that SD.begin() cannot read at speeds above 20MHz. We have lowered it to 15MHz.
 
-# Compile Notes
+- M5Stack Basic V2.6<br>When compiling with VSCode+PlatformIO, select `env:m5stack-grey` as the env.
 
-- M5Stack Fire V2.6/M5Stack Basic V2.6<br>When using a TF card, we have confirmed an event that SD.begin() cannot be read at 20MHz. Lower it to 15MHz.
+# Configuration
+If there is no YAML configuration file on the SD card, default values will be used. (Set to connect servo to PortA.)
+Place `/yaml/SC_BasicConfig.yaml` on the SD card to use your own settings.
 
-- M5Stack Basic V2.6<br>Please select `env:m5stack-grey` for env when compiling with VSCode+PlatformIO.
+**On 2022/10/18, we changed from JSON to YAML. You can convert from JSON to YAML using [JSON to YAML Converter](https://www.site24x7.com/tools/json-to-yaml.html).**<br>Please note that comment handling has changed.
+**On 2025/03/24, we changed to use the stackchan-arduino library. Please create SC_BasicConfig.yaml based on the contents of SC_Config.yaml.**
 
-# Settings
-If there is no YAML file for configuration on the SD card, the default values are used. (It is configured to connect servos to PortA.)
-If you put `/yaml/SC_Config.yaml` in your SD card, you can use your own settings.
+For details, please refer to the [YAML file](https://github.com/mongonta0716/stackchan-bluetooth-simple/blob/main/data/yaml/SC_BasicConfig.yaml).
 
-Please refer to [YAML file](https://github.com/mongonta0716/stackchan-bluetooth-simple/blob/main/data/yaml/SC_Config.yaml) for the default settings.
-
-## Setting Items
-
-(Initial values in parentheses)
-
+## Configuration Items
+(Values in parentheses are default values)
 - servo
     - pin
-        - x(Core1 22, Core2 33)<br> GPIO No of Servo X(Serial Servo:RX pin)
-        - y(Core1 21, Core2 32)<br> GPIO No of Servo Y(Serial Servo:TX pin)
-    - offset<br>
-        - x(0)<br> Offset x
-        - y(0)<br> Offset y
-
-    - speed<br>Specify the standby time and servo travel time when the sound is on standby and Bluetooth speaker. Specify a range with minimum and maximum values and use random values.
+        - x(Core1 22, Core2 33, CoreS3 1)<br> Specify GPIO for X-axis (RX for serial servo)
+        - y(Core1 21, Core2 32, CoreS3 2)<br> Specify GPIO for Y-axis (TX for serial servo)
+    - offset<br>Parameter to correct misalignment when servo axis is at 90°
+        - x(0)<br> Set X-axis offset value
+        - y(0)<br> Set Y-axis offset value
+    - center<br>Specify servo center position
+        - x(180)<br> X-axis center position
+        - y(270)<br> Y-axis center position
+    - lower_limit<br>Specify servo lower limit
+        - x(0)<br> X-axis lower limit
+        - y(240)<br> Y-axis lower limit
+    - upper_limit<br>Specify servo upper limit
+        - x(360)<br> X-axis upper limit
+        - y(280)<br> Y-axis upper limit
+    - speed<br>Specify waiting time and servo movement time during standby and when sound is playing through Bluetooth speaker. Random values are used within the range specified by minimum and maximum values.
         - normal_mode
-             - interval_min(5000)
-             - interval_max(10000)
+             - interval_min(3000)
+             - interval_max(6000)
              - move_min(500)
              - move_max(1500)
         - sing_mode
-             - interval_min(1000)
-             - interval_max(2000)
+             - interval_min(500)
+             - interval_max(1000)
              - move_min(500)
-             - move_max(1500)
+             - move_max(1000)
 - bluetooth
-    - device_name(M5Stack_BTSPK)<br>Specify the device name of the Bluetooth speaker.
-    - starting_state(true)<br>Specify whether Bluetooth mode is enabled or disabled at startup.
-    - start_volume(150)<br>Initial volume of Bluetooth speaker.
+    - device_name(M5Stack)<br>Specify the Bluetooth speaker device name.
+    - starting_state(false)<br>Specify whether to start in Bluetooth mode.
+    - start_volume(100)<br>Set initial value for Bluetooth speaker
 
-- auto_power_off_time(0)<br>Core2 only. power off after USB power supply is turned off and after a set time elapses. (0 does not power off)
+- auto_power_off_time(0)<br>Core2 only. Powers off after the specified time has elapsed after USB power supply is turned OFF. (0 means no power off)
 
-- balloon<br>Set up callouts.
-    - font_language("JA")<br>Specifies the language of the font." JA" or "CN", otherwise Latin font is used.
-    - lyrics("おはよう","Hello","你好","Bonjour")<br>Sets lines to be displayed at random in Normal mode. Up to 10 lines.
-- led_lr<br>GoBottom1/2 will make the LED glow in response to volume. Source needs to be rewritten and compiled.
-
+- balloon<br>Configure speech bubble settings.
+    - font_language("CN")<br>Specify font language. "JA" or "CN", uses Latin font if not specified.
+    - lyrics<br>Set lines to display randomly in normal mode. Maximum of 10 lines.
+- led_lr(0)<br>LED lights according to volume in GoBottom1/2. *Requires source code modification and recompilation.
     - 0: Stereo
-    - 1: Left Only
-    - 2: Right Only
-
-- takao_base<br>Enable/disable [Stack-chan_Takao_Base](https://ssci.to/8905).
-
-- servo_type<br>Specify servo type
-    - "PWM": SG90 PWM Servo
-    - "SCS": Feetech SCS0009
+    - 1: Responds to left volume only
+    - 2: Responds to right volume only
+- led_pin(15)<br>Specify GPIO pin number for LED (GoBottom1: 15, GoBottom2: 25)
+- takao_base(false)<br>Setting for using [Stack-chan_Takao_Base](https://ssci.to/8905). (*Currently only supported on Core2)
+- servo_type("DYN_XL330")<br>Specify servo type
+    - "PWM": SG90 series PWM servo
+    - "SCS": Feetech SCS0009 serial servo
+    - "DYN_XL330": Dynamixel XL330 serial servo
+- extend_config_filename("")<br>Configuration filename for application
+- extend_config_filesize(2048)<br>Buffer size for feature extensions
+- secret_config_filename("")<br>Configuration filename for personal information
+- secret_config_filesize(2048)<br>Buffer size for personal information
+- secret_info_show(true)<br>Whether to output personal information to log
 
 # Usage
 
-- BtnA<br>Enters Bluetooth mode. (Only valid when bluetooth_mode = false)
+- BtnA<br>Enter Bluetooth mode. (Only valid when bluetooth_mode = false)<br>
 
-- BtnB<br>Volume down.
+- BtnB<br>Decrease volume.
 
-- BtnC<br>Volume up.
+- BtnC<br>Increase volume.
 
 # Credit
 - [meganetaaan](https://github.com/meganetaaan)
@@ -120,6 +119,4 @@ Please refer to [YAML file](https://github.com/mongonta0716/stackchan-bluetooth-
 
 # Author
 [Takao Akaki](https://github.com/mongonta0716)
-
-
 
