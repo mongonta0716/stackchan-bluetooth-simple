@@ -6,6 +6,7 @@
 
 //#include <Ticker.h>
 #include <SD.h>
+// M5というグローバルなオブジェクトが使えるようになる
 #include <M5Unified.h>
 //#include <WiFi.h>
 //#include <WiFiUdp.h>
@@ -367,6 +368,7 @@ void setup(void)
 
 void loop(void)
 {
+	int master_volume = 40;
 
   M5.update();
   if (M5.BtnA.wasDecideClickCount())
@@ -400,27 +402,43 @@ void loop(void)
     }
   }
   if (M5.BtnB.wasPressed()) {
-    uint8_t volume = M5.Speaker.getChannelVolume(m5spk_virtual_channel);
-  	volume = (volume >= 20) ? volume - 20 : 0;
+		// Bボタンを押したらボリュームを下げる
+		// 現在のボリュームを取得
+    uint8_t now_volume = M5.Speaker.getChannelVolume(m5spk_virtual_channel);
+  	uint8_t new_volume = (now_volume >= 20) ? now_volume - 20 : 0;
 
-    M5.Speaker.setVolume(volume);
-    M5.Speaker.setChannelVolume(m5spk_virtual_channel, volume);
+		M5.Speaker.setVolume(master_volume);
+    M5.Speaker.setChannelVolume(m5spk_virtual_channel, master_volume);
+
     M5.Speaker.tone(2000, 100);
     delay(200);
     M5.Speaker.tone(1000, 100);
-		M5_LOGI("Volume: %d", volume);
+
+    delay(400);
+		// マスター音量（すべての仮想チャンネル共通）を設定
+    M5.Speaker.setVolume(new_volume);
+		// 特定の 仮想チャンネル（0〜7）に対して個別の音量を設定
+    M5.Speaker.setChannelVolume(m5spk_virtual_channel, new_volume);
+
+		M5_LOGI("Volume: %d", new_volume);
   }
 
   if (M5.BtnC.wasPressed()) {
-    uint8_t volume = M5.Speaker.getChannelVolume(m5spk_virtual_channel);
-  	volume = (volume <= 235) ? volume + 20 : 255;
+		// ボリュームを上げる
+		uint8_t now_volume = M5.Speaker.getChannelVolume(m5spk_virtual_channel);
+  	uint8_t new_volume = (now_volume <= 235) ? now_volume + 20 : 255;
 
-    M5.Speaker.setVolume(volume);
-    M5.Speaker.setChannelVolume(m5spk_virtual_channel, volume);
+		M5.Speaker.setVolume(master_volume);
+    M5.Speaker.setChannelVolume(m5spk_virtual_channel, master_volume);
+
     M5.Speaker.tone(1000, 100);
     delay(200);
     M5.Speaker.tone(2000, 100);
-		M5_LOGI("Volume: %d", volume);
+    delay(400);
+    M5.Speaker.setVolume(new_volume);
+    M5.Speaker.setChannelVolume(m5spk_virtual_channel, new_volume);
+
+		M5_LOGI("Volume: %d", new_volume);
 
 		// // ボリューム表示	→動かなかったので次回確認
 		// M5.Lcd.fillRect(0, 0, 80, 16, TFT_BLACK);
