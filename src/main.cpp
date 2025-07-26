@@ -401,21 +401,31 @@ void loop(void)
   }
   if (M5.BtnB.wasPressed()) {
     uint8_t volume = M5.Speaker.getChannelVolume(m5spk_virtual_channel);
-    volume = volume - 10;
+  	volume = (volume >= 20) ? volume - 20 : 0;
+
     M5.Speaker.setVolume(volume);
     M5.Speaker.setChannelVolume(m5spk_virtual_channel, volume);
     M5.Speaker.tone(2000, 100);
     delay(200);
     M5.Speaker.tone(1000, 100);
+		M5_LOGI("Volume: %d", volume);
   }
+
   if (M5.BtnC.wasPressed()) {
     uint8_t volume = M5.Speaker.getChannelVolume(m5spk_virtual_channel);
-    volume = volume + 10;
+  	volume = (volume <= 235) ? volume + 20 : 255;
+
     M5.Speaker.setVolume(volume);
     M5.Speaker.setChannelVolume(m5spk_virtual_channel, volume);
     M5.Speaker.tone(1000, 100);
     delay(200);
     M5.Speaker.tone(2000, 100);
+		M5_LOGI("Volume: %d", volume);
+
+		// // ボリューム表示	→動かなかったので次回確認
+		// M5.Lcd.fillRect(0, 0, 80, 16, TFT_BLACK);
+		// M5.Lcd.setCursor(0, 0);
+		// M5.Lcd.printf("Vol: %3d", volume);
   }
   if ((millis() - last_powericon_millis)> powericon_interval) {
 /*
