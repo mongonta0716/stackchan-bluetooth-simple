@@ -23,7 +23,7 @@ StackchanSERVO servo;
 
 // M5GoBottomのLEDを使わない場合は下記の1行をコメントアウトしてください。
 #define USE_LED
-#define USE_LED_OUT
+//#define USE_LED_OUT
 
 #ifdef USE_LED
   #include <FastLED.h>
